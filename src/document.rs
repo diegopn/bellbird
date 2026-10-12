@@ -182,24 +182,10 @@ fn render_latex_template(document: &Document, template: LatexTemplate) -> String
         .title
         .as_deref()
         .filter(|title| !title.trim().is_empty());
-    let heading_title = if explicit_title.is_none() {
-        match document.blocks.first() {
-            Some(Block::Heading { level: 1, content }) => Some(content.as_slice()),
-            _ => None,
-        }
-    } else {
-        None
-    };
-    let first_heading_is_title = heading_title.is_some();
     let title = explicit_title
         .map(escape_latex)
-        .or_else(|| heading_title.map(|content| render_inlines(content, &footnote_numbers)))
         .unwrap_or_else(|| escape_latex("[INSERIR TÍTULO]"));
-    let blocks = if first_heading_is_title {
-        &document.blocks[1..]
-    } else {
-        &document.blocks
-    };
+    let blocks = &document.blocks;
     for block in blocks {
         inspect_block(block, &mut packages);
     }

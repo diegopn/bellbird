@@ -19,7 +19,7 @@ fn markdown_keeps_headings_lists_and_unicode() {
         Block::List { ordered: false, .. }
     ));
     let latex = render_latex(&document, LatexTemplate::Standard);
-    assert!(latex.contains("\\section{Café}"));
+    assert!(latex.contains("\\section{Café}"), "{latex}");
     assert!(latex.contains("Olá, mundo!"));
     assert!(latex.contains("\\begin{itemize}"));
 }
@@ -83,7 +83,10 @@ fn templates_use_their_academic_classes() {
     assert!(abnt.contains(r"\postextual"));
 
     let ieee = render_latex(&document, LatexTemplate::Ieee);
-    assert!(ieee.contains(r"\documentclass[conference]{IEEEtran}"));
+    assert!(
+        ieee.contains(r"\documentclass[conference]{IEEEtran}"),
+        "{ieee}"
+    );
     assert!(ieee.contains(r"\IEEEauthorblockN{First Author, Second Author}"));
     assert!(ieee.contains("\\begin{IEEEkeywords}"));
 
@@ -133,7 +136,10 @@ fn nested_markdown_emphasis_is_preserved() {
     let document = parse_markdown("**forte e _ênfase_**\n");
     let latex = render_latex(&document, LatexTemplate::Standard);
 
-    assert!(latex.contains("\\textbf{forte e \\emph{ênfase}}"));
+    assert!(
+        latex.contains("\\textbf{forte e \\emph{ênfase}}"),
+        "{latex}"
+    );
 }
 
 #[test]
@@ -173,7 +179,7 @@ fn structured_html_is_converted_into_the_existing_document_model() {
         panic!("HTML should produce a document");
     };
     let latex = render_latex(&document, LatexTemplate::Standard);
-    assert!(latex.contains("\\section{Relatorio}"));
+    assert!(latex.contains("\\section{Relatorio}"), "{latex}");
     assert!(latex.contains("Texto \\& conteudo."));
 }
 
