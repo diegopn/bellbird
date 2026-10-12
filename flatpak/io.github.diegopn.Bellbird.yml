@@ -1,0 +1,42 @@
+app-id: io.github.diegopn.Bellbird
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    RUSTC: /usr/lib/sdk/rust-stable/bin/rustc
+    CARGO_NET_OFFLINE: 'false'
+command: bellbird
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --talk-name=org.a11y.Bus
+  - --filesystem=xdg-download:create
+modules:
+  - name: bellbird
+    buildsystem: simple
+    build-options:
+      env:
+        CARGO_HOME: /run/build/bellbird/cargo
+        BELLBIRD_LOCALE_DIR: /app/share/locale
+    build-commands:
+      - /usr/lib/sdk/rust-stable/bin/cargo build --locked --release
+      - install -Dm0755 target/release/bellbird "${FLATPAK_DEST}/bin/bellbird"
+      - install -Dm0644 data/io.github.diegopn.Bellbird.desktop "${FLATPAK_DEST}/share/applications/io.github.diegopn.Bellbird.desktop"
+      - install -Dm0644 data/io.github.diegopn.Bellbird.metainfo.xml "${FLATPAK_DEST}/share/metainfo/io.github.diegopn.Bellbird.metainfo.xml"
+      - install -Dm0644 data/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg"
+      - install -Dm0644 data/icons/hicolor/scalable/actions/external-link-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/external-link-symbolic.svg"
+      - for size in 16 24 32 48 64 128 256 512; do install -Dm0644 "data/icons/hicolor/${size}x${size}/apps/io.github.diegopn.Bellbird.png" "${FLATPAK_DEST}/share/icons/hicolor/${size}x${size}/apps/io.github.diegopn.Bellbird.png"; done
+    sources:
+      - type: dir
+        path: ..
+        skip:
+          - .git
+          - build
+          - docs
+          - target
+      - cargo-sources.json

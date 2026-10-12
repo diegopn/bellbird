@@ -1,0 +1,124 @@
+window.bellbird-window {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+window.bellbird-window box.bellbird-root,
+window.bellbird-window box.bellbird-landing {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+window.bellbird-window headerbar.bellbird-headerbar {
+  background-color: @window_bg_color;
+  background-image: none;
+  border-style: none;
+  box-shadow: none;
+}
+
+window.bellbird-window button.suggested-action {
+  color: #ffffff;
+  background-color: #3478f6;
+  background-image: none;
+  border-color: #3478f6;
+}
+
+window.bellbird-window button.suggested-action:hover {
+  background-color: #4b87f7;
+  border-color: #4b87f7;
+}
+
+window.bellbird-window button.suggested-action:active {
+  background-color: #285ac2;
+  border-color: #285ac2;
+}
+
+window.bellbird-window frame.latex-output-frame {
+  background-color: @view_bg_color;
+  border: 1px solid @borders;
+  border-radius: 10px;
+}
+
+window.bellbird-window frame.latex-output-frame > border {
+  border-radius: 10px;
+}
+
+window.bellbird-window textview.latex-output,
+window.bellbird-window textview.line-number-gutter {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+  font-family: monospace;
+}
+
+window.bellbird-window textview.line-number-gutter {
+  color: alpha(@view_fg_color, 0.65);
+  border-right: 1px solid @borders;
+}
+
+window.bellbird-window popover box.bellbird-menu-content {
+  min-width: 220px;
+  padding: 8px;
+}
+
+window.bellbird-window button.appearance-choice {
+  min-width: 42px;
+  min-height: 42px;
+  padding: 3px;
+  border-radius: 999px;
+}
+
+window.bellbird-window label.appearance-check {
+  min-width: 15px;
+  min-height: 15px;
+  border-radius: 999px;
+  background-color: #3478f6;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+window.bellbird-window button.bellbird-menu-item {
+  min-height: 40px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+window.bellbird-window box.bellbird-about-content {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+window.bellbird-window label.about-version {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background-color: alpha(@accent_bg_color, 0.18);
+  color: @accent_color;
+  font-weight: 700;
+}
+
+window.bellbird-window button.link.about-link {
+  min-height: 48px;
+  padding: 0 14px;
+  color: @window_fg_color;
+  background-color: transparent;
+  background-image: none;
+  text-decoration: none;
+}
+
+window.bellbird-window button.link.about-link:hover {
+  background-color: alpha(@window_fg_color, 0.08);
+}
+
+window.bellbird-window button.link.about-link-card {
+  border-radius: 12px;
+  background-color: @card_bg_color;
+}
+
+window.bellbird-window box.about-link-group {
+  border-radius: 12px;
+  background-color: @card_bg_color;
+}
+
+window.bellbird-window box.about-link-group separator {
+  margin: 0 12px;
+}

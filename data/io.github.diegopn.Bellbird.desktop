@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=Bellbird
+GenericName=Document to LaTeX converter
+GenericName[pt_BR]=Conversor de documentos para LaTeX
+GenericName[pt]=Conversor de documentos para LaTeX
+GenericName[pt_PT]=Conversor de documentos para LaTeX
+GenericName[es]=Conversor de documentos a LaTeX
+Comment=Convert documents into clean LaTeX
+Comment[pt_BR]=Converta documentos em LaTeX organizado
+Comment[pt]=Converta documentos em LaTeX organizado
+Comment[pt_PT]=Converta documentos em LaTeX organizado
+Comment[es]=Convierte documentos en LaTeX bien estructurado
+Exec=bellbird
+Icon=io.github.diegopn.Bellbird
+Terminal=false
+Type=Application
+Categories=Office;
+StartupNotify=true
+StartupWMClass=io.github.diegopn.Bellbird
