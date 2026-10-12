@@ -1,3 +1,7 @@
+<p>
+  <img src="data/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg" alt="Bellbird icon" width="96" height="96">
+</p>
+
 # Bellbird
 
 O Bellbird é um aplicativo para GNOME que converte documentos em código LaTeX organizado. A conversão acontece localmente: o aplicativo não exige conta nem conexão com a internet para processar arquivos.
