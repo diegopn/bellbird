@@ -127,11 +127,11 @@ msgstr "Copiar LaTeX"
 msgid "Export LaTeX"
 msgstr "Exportar LaTeX"
 
-msgid "LaTeX exported to Downloads"
-msgstr "LaTeX exportado a Descargas"
+msgid "Save"
+msgstr "Guardar"
 
-msgid "Could not find the Downloads folder."
-msgstr "No se pudo encontrar la carpeta Descargas."
+msgid "LaTeX exported successfully"
+msgstr "LaTeX exportado correctamente"
 
 msgid "Could not export LaTeX."
 msgstr "No se pudo exportar el LaTeX."

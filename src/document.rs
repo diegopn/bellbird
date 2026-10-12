@@ -92,8 +92,7 @@ pub enum LatexTemplate {
     SpringerNature,
 }
 
-const SAFE_FALLBACK_NOTICE: &str =
-    "% Bellbird: conteúdo irregular foi convertido para texto simples para preservar um LaTeX válido.";
+const SAFE_FALLBACK_NOTICE: &str = "% Bellbird: conteúdo irregular foi convertido para texto simples para preservar um LaTeX válido.";
 
 impl LatexTemplate {
     pub const EXPORT_OPTIONS: [Self; 5] = [
@@ -152,7 +151,10 @@ pub fn render_latex(document: &Document, template: LatexTemplate) -> String {
         return output;
     }
 
-    format!("{SAFE_FALLBACK_NOTICE}\n{}", render_minimal_safe_latex(&safe_document))
+    format!(
+        "{SAFE_FALLBACK_NOTICE}\n{}",
+        render_minimal_safe_latex(&safe_document)
+    )
 }
 
 pub fn used_safe_fallback(latex: &str) -> bool {
@@ -262,9 +264,10 @@ fn replace_math_with_text(blocks: &mut [Block]) {
                     replace_math_with_text(item);
                 }
             }
-            Block::Quote(children) | Block::FootnoteDefinition { content: children, .. } => {
-                replace_math_with_text(children)
-            }
+            Block::Quote(children)
+            | Block::FootnoteDefinition {
+                content: children, ..
+            } => replace_math_with_text(children),
             Block::Table { headers, rows } => {
                 replace_row_math_with_text(headers);
                 for row in rows {
@@ -272,8 +275,7 @@ fn replace_math_with_text(blocks: &mut [Block]) {
                 }
             }
             Block::DisplayMath(_) => {
-                if let Block::DisplayMath(formula) =
-                    std::mem::replace(block, Block::HorizontalRule)
+                if let Block::DisplayMath(formula) = std::mem::replace(block, Block::HorizontalRule)
                 {
                     *block = Block::Paragraph(vec![Inline::Code(formula)]);
                 }
@@ -385,7 +387,10 @@ fn plain_block_text(block: &Block) -> String {
             .filter(|text| !text.trim().is_empty())
             .collect::<Vec<_>>()
             .join("\n"),
-        Block::Quote(children) | Block::FootnoteDefinition { content: children, .. } => children
+        Block::Quote(children)
+        | Block::FootnoteDefinition {
+            content: children, ..
+        } => children
             .iter()
             .map(plain_block_text)
             .filter(|text| !text.trim().is_empty())
@@ -441,9 +446,10 @@ fn collect_citation_keys_from_blocks(blocks: &[Block], keys: &mut BTreeMap<Strin
                     collect_citation_keys_from_blocks(item, keys);
                 }
             }
-            Block::Quote(children) | Block::FootnoteDefinition { content: children, .. } => {
-                collect_citation_keys_from_blocks(children, keys)
-            }
+            Block::Quote(children)
+            | Block::FootnoteDefinition {
+                content: children, ..
+            } => collect_citation_keys_from_blocks(children, keys),
             Block::Table { headers, rows } => {
                 collect_citation_keys_from_row(headers, keys);
                 for row in rows {
@@ -472,9 +478,7 @@ fn collect_citation_keys_from_inlines(inlines: &[Inline], keys: &mut BTreeMap<St
             }
             Inline::Emphasis(children)
             | Inline::Strong(children)
-            | Inline::Strikethrough(children) => {
-                collect_citation_keys_from_inlines(children, keys)
-            }
+            | Inline::Strikethrough(children) => collect_citation_keys_from_inlines(children, keys),
             Inline::Link { content, .. } => collect_citation_keys_from_inlines(content, keys),
             Inline::Image { alt, .. } => collect_citation_keys_from_inlines(alt, keys),
             Inline::Text(_)
@@ -1043,8 +1047,11 @@ pub fn validate_generated_latex(latex: &str) -> Result<(), String> {
                         return Err("an inline verbatim command is incomplete".to_owned());
                     };
                     index += 1;
-                    let Some(end) = bytes[index..].iter().position(|byte| *byte == delimiter) else {
-                        return Err("an inline verbatim command has no closing delimiter".to_owned());
+                    let Some(end) = bytes[index..].iter().position(|byte| *byte == delimiter)
+                    else {
+                        return Err(
+                            "an inline verbatim command has no closing delimiter".to_owned()
+                        );
                     };
                     index += end + 1;
                     continue;
@@ -1150,7 +1157,14 @@ fn read_braced_group(bytes: &[u8], start: usize) -> Option<(String, usize)> {
 fn is_citation_command(command: &str) -> bool {
     matches!(
         command,
-        "cite" | "citep" | "citet" | "citeauthor" | "citeyear" | "autocite" | "parencite" | "textcite"
+        "cite"
+            | "citep"
+            | "citet"
+            | "citeauthor"
+            | "citeyear"
+            | "autocite"
+            | "parencite"
+            | "textcite"
     )
 }
 
@@ -1181,5 +1195,8 @@ fn is_external_file_command(command: &str) -> bool {
 }
 
 fn is_verbatim_environment(environment: &str) -> bool {
-    matches!(environment, "verbatim" | "verbatim*" | "lstlisting" | "minted")
+    matches!(
+        environment,
+        "verbatim" | "verbatim*" | "lstlisting" | "minted"
+    )
 }

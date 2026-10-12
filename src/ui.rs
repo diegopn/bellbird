@@ -147,7 +147,7 @@ fn build_window(application: &adw::Application) {
     let export_views = views.clone();
     result
         .export_button
-        .connect_clicked(move |_| export_latex_to_downloads(&export_views));
+        .connect_clicked(move |_| export_latex_with_chooser(&export_views));
 
     window.present();
 }
@@ -999,7 +999,10 @@ fn show_toast(views: &Views, message: &str) {
     }
 }
 
-fn export_latex_to_downloads(views: &Views) {
+fn export_latex_with_chooser(views: &Views) {
+    let Some(window) = views.window.upgrade() else {
+        return;
+    };
     let (source_name, output) = {
         let state = views.state.borrow();
         let Some(imported) = state.imported.as_ref() else {
@@ -1007,30 +1010,73 @@ fn export_latex_to_downloads(views: &Views) {
         };
         (imported.display_name.clone(), state.output.clone())
     };
-    let Some(downloads_dir) = glib::user_special_dir(glib::UserDirectory::Downloads) else {
-        show_toast(views, &tr("Could not find the Downloads folder."));
-        return;
-    };
 
     let mut output_name = PathBuf::from(source_name);
     output_name.set_extension("tex");
-    let result = fs::create_dir_all(&downloads_dir).and_then(|()| {
-        save_without_overwriting(&downloads_dir, &output_name, output.as_bytes())
-    });
-    match result {
-        Ok(_) => show_toast(views, &tr("LaTeX exported to Downloads")),
-        Err(error) => {
-            eprintln!("Could not export LaTeX: {error}");
-            show_toast(views, &tr("Could not export LaTeX."));
-        }
+    let initial_name = output_name
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "document.tex".to_owned());
+
+    let dialog = gtk::FileDialog::new();
+    dialog.set_title(&tr("Export LaTeX"));
+    dialog.set_accept_label(Some(&tr("Save")));
+    dialog.set_modal(true);
+    dialog.set_initial_name(Some(&initial_name));
+    if let Some(downloads_dir) = glib::user_special_dir(glib::UserDirectory::Downloads)
+        .filter(|path| path.is_dir())
+    {
+        let downloads_folder = gio::File::for_path(downloads_dir);
+        dialog.set_initial_folder(Some(&downloads_folder));
     }
+
+    let dialog_views = views.clone();
+    dialog.save(
+        Some(&window),
+        None::<&gio::Cancellable>,
+        move |response| match response {
+            Ok(file) => {
+                let Some(path) = file.path() else {
+                    show_toast(
+                        &dialog_views,
+                        &tr("The selected file is not available as a local path."),
+                    );
+                    return;
+                };
+                let Some(directory) = path.parent() else {
+                    show_toast(&dialog_views, &tr("Could not export LaTeX."));
+                    return;
+                };
+                let Some(file_name) = path.file_name() else {
+                    show_toast(&dialog_views, &tr("Could not export LaTeX."));
+                    return;
+                };
+                match save_without_overwriting(
+                    directory,
+                    Path::new(file_name),
+                    output.as_bytes(),
+                ) {
+                    Ok(()) => show_toast(&dialog_views, &tr("LaTeX exported successfully")),
+                    Err(error) => {
+                        eprintln!("Could not export LaTeX: {error}");
+                        show_toast(&dialog_views, &tr("Could not export LaTeX."));
+                    }
+                }
+            }
+            Err(error) if error.matches(gio::IOErrorEnum::Cancelled) => {}
+            Err(error) => {
+                eprintln!("Could not open export dialog: {error}");
+                show_toast(&dialog_views, &tr("Could not export LaTeX."));
+            }
+        },
+    );
 }
 
 fn save_without_overwriting(
     directory: &Path,
     requested_name: &Path,
     contents: &[u8],
-) -> std::io::Result<PathBuf> {
+) -> std::io::Result<()> {
     let stem = requested_name
         .file_stem()
         .and_then(|name| name.to_str())
@@ -1044,18 +1090,14 @@ fn save_without_overwriting(
             format!("{stem} ({suffix}).tex")
         };
         let path = directory.join(file_name);
-        match OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&path)
-        {
+        match OpenOptions::new().write(true).create_new(true).open(&path) {
             Ok(mut file) => {
                 if let Err(error) = file.write_all(contents) {
                     drop(file);
                     let _ = fs::remove_file(&path);
                     return Err(error);
                 }
-                return Ok(path);
+                return Ok(());
             }
             Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
                 suffix = suffix.checked_add(1).ok_or(error)?;
