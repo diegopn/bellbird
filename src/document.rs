@@ -1199,3 +1199,42 @@ fn is_verbatim_environment(environment: &str) -> bool {
         "verbatim" | "verbatim*" | "lstlisting" | "minted"
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validator_accepts_nested_inline_formatting() {
+        let document = Document {
+            blocks: vec![Block::Paragraph(vec![Inline::Strong(vec![
+                Inline::Text("forte e ".into()),
+                Inline::Emphasis(vec![Inline::Text("ênfase".into())]),
+            ])])],
+            ..Document::default()
+        };
+        let latex = render_latex_template(&document, LatexTemplate::Standard);
+        let validation = validate_generated_latex(&latex);
+
+        assert!(validation.is_ok(), "{validation:?}\n{latex}");
+    }
+
+    #[test]
+    fn validator_accepts_ieee_metadata_and_environments() {
+        let document = Document {
+            metadata: Metadata {
+                title: Some("Sample title".into()),
+                authors: vec!["First Author".into(), "Second Author".into()],
+                abstract_text: Some("A short abstract.".into()),
+                keywords: vec!["first".into(), "second".into()],
+                ..Metadata::default()
+            },
+            blocks: vec![Block::Paragraph(vec![Inline::Text("Body".into())])],
+            ..Document::default()
+        };
+        let latex = render_latex_template(&document, LatexTemplate::Ieee);
+        let validation = validate_generated_latex(&latex);
+
+        assert!(validation.is_ok(), "{validation:?}\n{latex}");
+    }
+}
