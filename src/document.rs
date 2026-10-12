@@ -993,7 +993,17 @@ fn is_external_url(target: &str) -> bool {
 }
 
 pub fn validate_generated_latex(latex: &str) -> Result<(), String> {
-    if latex.contains("{{") || latex.contains("}}") {
+    if [
+        "{{PACKAGES}}",
+        "{{TITLE_AUTHOR}}",
+        "{{ABSTRACT}}",
+        "{{KEYWORDS}}",
+        "{{BODY}}",
+        "{{REFERENCES}}",
+    ]
+    .iter()
+    .any(|marker| latex.contains(marker))
+    {
         return Err("an internal template marker was not replaced".to_owned());
     }
 
