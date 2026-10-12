@@ -113,6 +113,19 @@ impl LatexTemplate {
             Self::SpringerNature => "Springer Nature · sn-jnl",
         }
     }
+
+    pub const fn source_url(self) -> Option<&'static str> {
+        match self {
+            Self::Standard => None,
+            Self::Abnt => Some("https://ctan.org/pkg/abntex2"),
+            Self::Ieee => Some("https://ctan.org/pkg/ieeetran"),
+            Self::Acm => Some("https://www.acm.org/publications/proceedings-template"),
+            Self::Elsevier => Some("https://ctan.org/pkg/elsarticle"),
+            Self::SpringerNature => {
+                Some("https://www.springernature.com/gp/authors/campaigns/latex-author-support")
+            }
+        }
+    }
 }
 
 pub fn escape_latex(input: &str) -> String {
