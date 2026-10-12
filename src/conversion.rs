@@ -123,7 +123,8 @@ fn extract_explicit_metadata(document: &mut Document) {
 
         let start = index + 1;
         let mut end = start;
-        while end < document.blocks.len() && !matches!(document.blocks[end], Block::Heading { .. }) {
+        while end < document.blocks.len() && !matches!(document.blocks[end], Block::Heading { .. })
+        {
             end += 1;
         }
         let mut section_text = inline_value.to_owned();

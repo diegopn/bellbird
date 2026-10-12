@@ -1023,8 +1023,8 @@ fn export_latex_with_chooser(views: &Views) {
     dialog.set_accept_label(Some(&tr("Save")));
     dialog.set_modal(true);
     dialog.set_initial_name(Some(&initial_name));
-    if let Some(downloads_dir) = glib::user_special_dir(glib::UserDirectory::Downloads)
-        .filter(|path| path.is_dir())
+    if let Some(downloads_dir) =
+        glib::user_special_dir(glib::UserDirectory::Downloads).filter(|path| path.is_dir())
     {
         let downloads_folder = gio::File::for_path(downloads_dir);
         dialog.set_initial_folder(Some(&downloads_folder));
@@ -1051,11 +1051,7 @@ fn export_latex_with_chooser(views: &Views) {
                     show_toast(&dialog_views, &tr("Could not export LaTeX."));
                     return;
                 };
-                match save_without_overwriting(
-                    directory,
-                    Path::new(file_name),
-                    output.as_bytes(),
-                ) {
+                match save_without_overwriting(directory, Path::new(file_name), output.as_bytes()) {
                     Ok(()) => show_toast(&dialog_views, &tr("LaTeX exported successfully")),
                     Err(error) => {
                         eprintln!("Could not export LaTeX: {error}");
