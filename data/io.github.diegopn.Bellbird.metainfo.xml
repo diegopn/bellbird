@@ -24,7 +24,31 @@
     <p xml:lang="es">Importa Markdown, texto plano, HTML, DOCX, ODT, EPUB, reStructuredText común, Org o LaTeX existente. Exporta LaTeX académico en los formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) o Springer Nature (sn-jnl), y copia el resultado de solo lectura.</p>
     <p xml:lang="es">La aplicación procesa los archivos localmente y no requiere una cuenta ni acceso a la red.</p>
   </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/diegopn/bellbird/4f44c4c63a930f2e71c357e4367a8163528da148/data/screenshots/bellbird-01-editor.png</image>
+      <caption>Example document converted to LaTeX with the ABNT template</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/diegopn/bellbird/4f44c4c63a930f2e71c357e4367a8163528da148/data/screenshots/bellbird-02-welcome.png</image>
+      <caption>Choose a document to start a conversion</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/diegopn/bellbird/4f44c4c63a930f2e71c357e4367a8163528da148/data/screenshots/bellbird-03-menu.png</image>
+      <caption>Open another document or view application information</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/diegopn/bellbird/4f44c4c63a930f2e71c357e4367a8163528da148/data/screenshots/bellbird-04-formats.png</image>
+      <caption>Choose an academic LaTeX template</caption>
+    </screenshot>
+  </screenshots>
   <releases>
+    <release version="0.2.0" date="2026-10-21">
+      <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.2.0</url>
+      <description>
+        <p>Improved inclusion of translated interface strings and added application screenshots.</p>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-10-12">
       <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.1.0</url>
       <description>
