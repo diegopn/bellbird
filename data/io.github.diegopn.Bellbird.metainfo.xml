@@ -24,6 +24,16 @@
     <p xml:lang="es">Importa Markdown, texto plano, HTML, DOCX, ODT, EPUB, reStructuredText común, Org o LaTeX existente. Exporta LaTeX académico en los formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) o Springer Nature (sn-jnl), y copia el resultado de solo lectura.</p>
     <p xml:lang="es">La aplicación procesa los archivos localmente y no requiere una cuenta ni acceso a la red.</p>
   </description>
+  <releases>
+    <release version="0.1.0" date="2026-10-12">
+      <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.1.0</url>
+      <description>
+        <p>First stable release of Bellbird, an offline GNOME application that converts documents into structured LaTeX.</p>
+        <p xml:lang="pt_BR">Primeira versão estável do Bellbird, um aplicativo GNOME offline que converte documentos em LaTeX estruturado.</p>
+        <p xml:lang="es">Primera versión estable de Bellbird, una aplicación GNOME sin conexión que convierte documentos en LaTeX estructurado.</p>
+      </description>
+    </release>
+  </releases>
   <translation type="gettext">io.github.diegopn.Bellbird</translation>
   <launchable type="desktop-id">io.github.diegopn.Bellbird.desktop</launchable>
   <content_rating type="oars-1.1"/>
