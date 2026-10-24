@@ -6,6 +6,7 @@ pub struct Document {
     pub blocks: Vec<Block>,
     pub references: Vec<Reference>,
     pub resources: Vec<ResourceReference>,
+    pub has_simplified_content: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -41,6 +42,7 @@ pub enum Block {
     List {
         ordered: bool,
         start: Option<u64>,
+        item_labels: Vec<Option<String>>,
         items: Vec<Vec<Block>>,
     },
     CodeBlock {
@@ -66,6 +68,9 @@ pub enum Inline {
     Emphasis(Vec<Inline>),
     Strong(Vec<Inline>),
     Strikethrough(Vec<Inline>),
+    Underline(Vec<Inline>),
+    Subscript(Vec<Inline>),
+    Superscript(Vec<Inline>),
     Code(String),
     Link {
         target: String,
@@ -302,7 +307,10 @@ fn replace_inline_math_with_text(inlines: &mut [Inline]) {
             }
             Inline::Emphasis(children)
             | Inline::Strong(children)
-            | Inline::Strikethrough(children) => replace_inline_math_with_text(children),
+            | Inline::Strikethrough(children)
+            | Inline::Underline(children)
+            | Inline::Subscript(children)
+            | Inline::Superscript(children) => replace_inline_math_with_text(children),
             Inline::Link { content, .. } => replace_inline_math_with_text(content),
             Inline::Image { alt, .. } => replace_inline_math_with_text(alt),
             Inline::Text(_)
@@ -413,7 +421,10 @@ fn plain_inline_text(inlines: &[Inline]) -> String {
             Inline::Text(text) | Inline::Code(text) | Inline::Math(text) => output.push_str(text),
             Inline::Emphasis(children)
             | Inline::Strong(children)
-            | Inline::Strikethrough(children) => output.push_str(&plain_inline_text(children)),
+            | Inline::Strikethrough(children)
+            | Inline::Underline(children)
+            | Inline::Subscript(children)
+            | Inline::Superscript(children) => output.push_str(&plain_inline_text(children)),
             Inline::Link { content, .. } => output.push_str(&plain_inline_text(content)),
             Inline::Image { alt, .. } => output.push_str(&plain_inline_text(alt)),
             Inline::Citation(keys) => {
@@ -477,7 +488,10 @@ fn collect_citation_keys_from_inlines(inlines: &[Inline], keys: &mut BTreeMap<St
             }
             Inline::Emphasis(children)
             | Inline::Strong(children)
-            | Inline::Strikethrough(children) => collect_citation_keys_from_inlines(children, keys),
+            | Inline::Strikethrough(children)
+            | Inline::Underline(children)
+            | Inline::Subscript(children)
+            | Inline::Superscript(children) => collect_citation_keys_from_inlines(children, keys),
             Inline::Link { content, .. } => collect_citation_keys_from_inlines(content, keys),
             Inline::Image { alt, .. } => collect_citation_keys_from_inlines(alt, keys),
             Inline::Text(_)
@@ -673,9 +687,11 @@ fn inspect_row(row: &[Vec<Inline>], packages: &mut BTreeSet<&'static str>) {
 fn inspect_inlines(inlines: &[Inline], packages: &mut BTreeSet<&'static str>) {
     for inline in inlines {
         match inline {
-            Inline::Emphasis(children) | Inline::Strong(children) => {
-                inspect_inlines(children, packages)
-            }
+            Inline::Emphasis(children)
+            | Inline::Strong(children)
+            | Inline::Underline(children)
+            | Inline::Subscript(children)
+            | Inline::Superscript(children) => inspect_inlines(children, packages),
             Inline::Strikethrough(children) => {
                 packages.insert("ulem");
                 inspect_inlines(children, packages);
@@ -752,7 +768,10 @@ fn collect_footnote_numbers_from_inlines(inlines: &[Inline], numbers: &mut Footn
             }
             Inline::Emphasis(children)
             | Inline::Strong(children)
-            | Inline::Strikethrough(children) => {
+            | Inline::Strikethrough(children)
+            | Inline::Underline(children)
+            | Inline::Subscript(children)
+            | Inline::Superscript(children) => {
                 collect_footnote_numbers_from_inlines(children, numbers);
             }
             Inline::Link { content, .. } => {
@@ -796,12 +815,17 @@ fn render_blocks(
             Block::List {
                 ordered,
                 start,
+                item_labels,
                 items,
             } => {
                 let environment = if *ordered { "enumerate" } else { "itemize" };
                 output.push_str(&format!("\\begin{{{environment}}}\n"));
                 for (index, item) in items.iter().enumerate() {
-                    if *ordered && let Some(start) = start.filter(|start| *start != 1) {
+                    if *ordered
+                        && let Some(label) = item_labels.get(index).and_then(Option::as_deref)
+                    {
+                        output.push_str(&format!("\\item[{label}] "));
+                    } else if *ordered && let Some(start) = start.filter(|start| *start != 1) {
                         output
                             .push_str(&format!("\\item[{}.] ", u128::from(start) + index as u128));
                     } else {
@@ -811,16 +835,7 @@ fn render_blocks(
                 }
                 output.push_str(&format!("\\end{{{environment}}}\n\n"));
             }
-            Block::CodeBlock { content, .. } => {
-                output.push_str("\\begin{quote}\\ttfamily\n");
-                for (index, line) in content.lines().enumerate() {
-                    if index > 0 {
-                        output.push_str("\\\\\n");
-                    }
-                    output.push_str(&escape_latex(line));
-                }
-                output.push_str("\n\\end{quote}\n");
-            }
+            Block::CodeBlock { content, .. } => render_code_block(content, output),
             Block::Quote(content) => {
                 output.push_str("\\begin{quote}\n");
                 render_blocks(content, output, template, footnote_numbers);
@@ -854,29 +869,58 @@ fn render_table(
     if columns == 0 {
         return;
     }
-    let layout = "l".repeat(columns);
+    let width = 0.95_f64 / columns as f64;
+    let layout = (0..columns)
+        .map(|_| format!("p{{\\dimexpr{width:.4}\\linewidth - 2pt\\relax}}"))
+        .collect::<Vec<_>>()
+        .join("@{\\hspace{2pt}}");
+    let layout = format!("@{{}}{layout}@{{}}");
     output.push_str(&format!("\\begin{{tabular}}{{{layout}}}\n\\hline\n"));
     if !headers.is_empty() {
-        render_table_row(headers, output, footnote_numbers);
+        render_table_row(headers, columns, output, footnote_numbers);
         output.push_str("\\\\\n\\hline\n");
     }
     for row in rows {
-        render_table_row(row, output, footnote_numbers);
+        render_table_row(row, columns, output, footnote_numbers);
         output.push_str("\\\\\n");
     }
     output.push_str("\\hline\n\\end{tabular}\n\n");
 }
 
+fn render_code_block(content: &str, output: &mut String) {
+    if content.contains("\\end{verbatim}") {
+        output.push_str("\\begin{quote}\\ttfamily\n");
+        for (index, line) in content.lines().enumerate() {
+            if index > 0 {
+                output.push_str("\\\\\n");
+            }
+            output.push_str(&escape_latex(line));
+        }
+        output.push_str("\n\\end{quote}\n");
+        return;
+    }
+
+    output.push_str("\\begin{verbatim}\n");
+    output.push_str(content);
+    if !content.ends_with('\n') {
+        output.push('\n');
+    }
+    output.push_str("\\end{verbatim}\n\n");
+}
+
 fn render_table_row(
     cells: &[Vec<Inline>],
+    columns: usize,
     output: &mut String,
     footnote_numbers: &FootnoteNumbers,
 ) {
-    for (index, cell) in cells.iter().enumerate() {
+    for index in 0..columns {
         if index > 0 {
             output.push_str(" & ");
         }
-        output.push_str(&render_inlines(cell, footnote_numbers));
+        if let Some(cell) = cells.get(index) {
+            output.push_str(&render_inlines(cell, footnote_numbers));
+        }
     }
 }
 
@@ -895,6 +939,18 @@ fn render_inlines(inlines: &[Inline], footnote_numbers: &FootnoteNumbers) -> Str
             )),
             Inline::Strikethrough(children) => output.push_str(&format!(
                 "\\sout{{{}}}",
+                render_inlines(children, footnote_numbers)
+            )),
+            Inline::Underline(children) => output.push_str(&format!(
+                "\\underline{{{}}}",
+                render_inlines(children, footnote_numbers)
+            )),
+            Inline::Subscript(children) => output.push_str(&format!(
+                "\\textsubscript{{{}}}",
+                render_inlines(children, footnote_numbers)
+            )),
+            Inline::Superscript(children) => output.push_str(&format!(
+                "\\textsuperscript{{{}}}",
                 render_inlines(children, footnote_numbers)
             )),
             Inline::Code(text) => output.push_str(&format!("\\texttt{{{}}}", escape_latex(text))),
