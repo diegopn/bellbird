@@ -890,7 +890,7 @@ fn convert_docling_node(
             *simplified = true;
             items
                 .iter()
-                .map(|item| {
+                .flat_map(|item| {
                     let fields = item
                         .marker
                         .iter()
@@ -901,7 +901,6 @@ fn convert_docling_node(
                         .join(": ");
                     paragraph(vec![Inline::Text(fields)])
                 })
-                .flatten()
                 .collect()
         }
         Node::KeyValueGraph { cells, .. } => {
@@ -909,8 +908,9 @@ fn convert_docling_node(
             cells
                 .iter()
                 .filter(|cell| !cell.text.trim().is_empty())
-                .map(|cell| paragraph(vec![Inline::Text(format!("{}: {}", cell.label, cell.text))]))
-                .flatten()
+                .flat_map(|cell| {
+                    paragraph(vec![Inline::Text(format!("{}: {}", cell.label, cell.text))])
+                })
                 .collect()
         }
         Node::CommentSection { text, .. }
