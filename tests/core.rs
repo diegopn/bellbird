@@ -383,6 +383,12 @@ fn table_cell_line_break_does_not_end_the_row() {
                     Inline::Text("primeira linha".into()),
                     Inline::LineBreak,
                     Inline::Text("segunda linha".into()),
+                    Inline::Text(" ".into()),
+                    Inline::Strong(vec![
+                        Inline::Text("destaque".into()),
+                        Inline::LineBreak,
+                        Inline::Text("em duas linhas".into()),
+                    ]),
                 ],
                 vec![Inline::Text("conteúdo".into())],
             ]],
@@ -393,7 +399,9 @@ fn table_cell_line_break_does_not_end_the_row() {
     let latex = render_latex(&document, LatexTemplate::Standard);
 
     assert!(
-        latex.contains(r"primeira linha\newline{}segunda linha & conteúdo\\"),
+        latex.contains(
+            r"primeira linha\newline{}segunda linha \textbf{destaque\newline{}em duas linhas} & conteúdo\\"
+        ),
         "{latex}"
     );
     assert!(bellbird::document::validate_generated_latex(&latex).is_ok());

@@ -1487,7 +1487,7 @@ mod tests {
 
         let mut inline_group = Node::InlineGroup {
             unwrapped: false,
-            runs: vec![Default::default(), Default::default()],
+            runs: vec![Default::default(), Default::default(), Default::default()],
             md_text: String::new(),
         };
         if let Node::InlineGroup { runs, .. } = &mut inline_group {
@@ -1495,6 +1495,8 @@ mod tests {
             runs[0].bold = true;
             runs[1].text = "x_y".to_owned();
             runs[1].code = true;
+            runs[2].text = "x^2".to_owned();
+            runs[2].formula = true;
         }
 
         let table = Table {
@@ -1527,6 +1529,8 @@ mod tests {
                 Inline::Strong(vec![Inline::Text("destaque".to_owned())]),
                 Inline::Text(" ".to_owned()),
                 Inline::Code("x_y".to_owned()),
+                Inline::Text(" ".to_owned()),
+                Inline::Math("x^2".to_owned()),
             ]
         );
         assert!(!simplified);
