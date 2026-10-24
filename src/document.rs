@@ -384,7 +384,7 @@ fn render_minimal_safe_latex(document: &Document) -> String {
     output
 }
 
-fn plain_block_text(block: &Block) -> String {
+pub(crate) fn plain_block_text(block: &Block) -> String {
     match block {
         Block::Heading { content, .. } | Block::Paragraph(content) => plain_inline_text(content),
         Block::List { items, .. } => items
@@ -919,52 +919,64 @@ fn render_table_row(
             output.push_str(" & ");
         }
         if let Some(cell) = cells.get(index) {
-            output.push_str(&render_inlines(cell, footnote_numbers));
+            output.push_str(&render_inlines_with_context(cell, footnote_numbers, true));
         }
     }
 }
 
 fn render_inlines(inlines: &[Inline], footnote_numbers: &FootnoteNumbers) -> String {
+    render_inlines_with_context(inlines, footnote_numbers, false)
+}
+
+fn render_inlines_with_context(
+    inlines: &[Inline],
+    footnote_numbers: &FootnoteNumbers,
+    in_table_cell: bool,
+) -> String {
     let mut output = String::new();
     for inline in inlines {
         match inline {
             Inline::Text(text) => output.push_str(&escape_latex(text)),
             Inline::Emphasis(children) => output.push_str(&format!(
                 "\\emph{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Strong(children) => output.push_str(&format!(
                 "\\textbf{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Strikethrough(children) => output.push_str(&format!(
                 "\\sout{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Underline(children) => output.push_str(&format!(
                 "\\underline{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Subscript(children) => output.push_str(&format!(
                 "\\textsubscript{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Superscript(children) => output.push_str(&format!(
                 "\\textsuperscript{{{}}}",
-                render_inlines(children, footnote_numbers)
+                render_inlines_with_context(children, footnote_numbers, in_table_cell)
             )),
             Inline::Code(text) => output.push_str(&format!("\\texttt{{{}}}", escape_latex(text))),
             Inline::Link {
                 target, content, ..
             } => {
-                let content = render_inlines(content, footnote_numbers);
+                let content = render_inlines_with_context(content, footnote_numbers, in_table_cell);
                 if is_external_url(target) {
                     output.push_str(&format!("\\href{{{}}}{{{content}}}", escape_latex(target)));
                 } else {
                     output.push_str(&content);
                 }
             }
-            Inline::Image { alt, .. } => output.push_str(&render_inlines(alt, footnote_numbers)),
+            Inline::Image { alt, .. } => output.push_str(&render_inlines_with_context(
+                alt,
+                footnote_numbers,
+                in_table_cell,
+            )),
             Inline::Math(formula) => output.push_str(&format!("\\({formula}\\)")),
             Inline::Citation(keys) => {
                 let keys = keys
@@ -985,6 +997,7 @@ fn render_inlines(inlines: &[Inline], footnote_numbers: &FootnoteNumbers) -> Str
                     output.push_str("\\footnotemark{}");
                 }
             }
+            Inline::LineBreak if in_table_cell => output.push_str("\\newline{}"),
             Inline::LineBreak => output.push_str("\\\\\n"),
         }
     }

@@ -759,13 +759,6 @@ fn convert_docling_node(
             language: language.clone(),
         }],
         Node::Table(table) => {
-            if table
-                .cell_blocks
-                .as_ref()
-                .is_some_and(|rows| rows.iter().flatten().any(|cell| !cell.is_empty()))
-            {
-                *simplified = true;
-            }
             let mut blocks = Vec::new();
             if let Some(caption) = table.caption.as_deref().filter(|text| !text.is_empty()) {
                 blocks.push(Block::Paragraph(vec![Inline::Strong(
@@ -775,13 +768,27 @@ fn convert_docling_node(
             if let Some((header, rows)) = table.rows.split_first() {
                 let headers = header
                     .iter()
-                    .map(|cell| parse_markdown_inlines(cell, resources))
+                    .enumerate()
+                    .map(|(column, cell)| {
+                        docling_table_cell_inlines(table, 0, column, cell, resources, simplified)
+                    })
                     .collect();
                 let rows = rows
                     .iter()
-                    .map(|row| {
+                    .enumerate()
+                    .map(|(row_index, row)| {
                         row.iter()
-                            .map(|cell| parse_markdown_inlines(cell, resources))
+                            .enumerate()
+                            .map(|(column, cell)| {
+                                docling_table_cell_inlines(
+                                    table,
+                                    row_index + 1,
+                                    column,
+                                    cell,
+                                    resources,
+                                    simplified,
+                                )
+                            })
                             .collect()
                     })
                     .collect();
@@ -927,6 +934,79 @@ fn convert_docling_node(
         }
         Node::ListItem { .. } => unreachable!("list items are grouped before node conversion"),
     }
+}
+
+fn docling_table_cell_inlines(
+    table: &docling::Table,
+    row: usize,
+    column: usize,
+    flat_text: &str,
+    resources: &mut Vec<ResourceReference>,
+    simplified: &mut bool,
+) -> Vec<Inline> {
+    let Some(cell_nodes) = table
+        .cell_blocks
+        .as_ref()
+        .and_then(|rows| rows.get(row))
+        .and_then(|cells| cells.get(column))
+        .filter(|nodes| !nodes.is_empty())
+    else {
+        return parse_markdown_inlines(flat_text, resources);
+    };
+
+    let blocks = convert_docling_nodes(cell_nodes, resources, simplified);
+    let mut inlines = Vec::new();
+    for block in blocks {
+        let block_inlines = match &block {
+            Block::Heading { content, .. } => {
+                *simplified = true;
+                vec![Inline::Strong(content.clone())]
+            }
+            Block::Paragraph(content) => content.clone(),
+            Block::CodeBlock { content, .. } => {
+                *simplified = true;
+                vec![Inline::Code(content.clone())]
+            }
+            Block::DisplayMath(formula) => {
+                *simplified = true;
+                vec![Inline::Math(formula.clone())]
+            }
+            Block::HorizontalRule => {
+                *simplified = true;
+                vec![Inline::Text("—".to_owned())]
+            }
+            Block::List { .. }
+            | Block::Quote(_)
+            | Block::Table { .. }
+            | Block::FootnoteDefinition { .. } => {
+                *simplified = true;
+                plain_block_text_inlines(crate::document::plain_block_text(&block))
+            }
+        };
+        if !inlines.is_empty() && !block_inlines.is_empty() {
+            inlines.push(Inline::LineBreak);
+        }
+        inlines.extend(block_inlines);
+    }
+
+    if inlines.is_empty() {
+        parse_markdown_inlines(flat_text, resources)
+    } else {
+        inlines
+    }
+}
+
+fn plain_block_text_inlines(text: String) -> Vec<Inline> {
+    let mut inlines = Vec::new();
+    for (index, line) in text.split('\n').enumerate() {
+        if index > 0 {
+            inlines.push(Inline::LineBreak);
+        }
+        if !line.is_empty() {
+            inlines.push(Inline::Text(line.trim_end_matches('\r').to_owned()));
+        }
+    }
+    inlines
 }
 
 fn docling_link(content: Vec<Inline>, href: &Option<String>) -> Vec<Inline> {
@@ -1399,6 +1479,116 @@ mod tests {
             ]
         );
         assert!(!simplified);
+    }
+
+    #[test]
+    fn docling_rich_table_cells_keep_formatting_and_paragraph_breaks() {
+        use docling::{Node, Table};
+
+        let mut inline_group = Node::InlineGroup {
+            unwrapped: false,
+            runs: vec![Default::default(), Default::default()],
+            md_text: String::new(),
+        };
+        if let Node::InlineGroup { runs, .. } = &mut inline_group {
+            runs[0].text = "destaque".to_owned();
+            runs[0].bold = true;
+            runs[1].text = "x_y".to_owned();
+            runs[1].code = true;
+        }
+
+        let table = Table {
+            rows: vec![vec!["Campo".to_owned()], vec!["texto plano".to_owned()]],
+            cell_blocks: Some(vec![
+                vec![vec![]],
+                vec![vec![
+                    Node::Paragraph {
+                        text: "Primeiro parágrafo".to_owned(),
+                    },
+                    inline_group,
+                ]],
+            ]),
+            ..Table::default()
+        };
+        let node = Node::Table(table);
+        let mut resources = Vec::new();
+        let mut simplified = false;
+
+        let blocks = convert_docling_node(&node, &mut resources, &mut simplified);
+
+        let Block::Table { rows, .. } = &blocks[0] else {
+            panic!("expected a table block");
+        };
+        assert_eq!(
+            rows[0][0],
+            vec![
+                Inline::Text("Primeiro parágrafo".to_owned()),
+                Inline::LineBreak,
+                Inline::Strong(vec![Inline::Text("destaque".to_owned())]),
+                Inline::Text(" ".to_owned()),
+                Inline::Code("x_y".to_owned()),
+            ]
+        );
+        assert!(!simplified);
+    }
+
+    #[test]
+    fn docling_table_cells_fall_back_when_rich_blocks_are_absent() {
+        use docling::{Node, Table};
+
+        let cell_block_variants: [Option<Vec<Vec<Vec<Node>>>>; 2] =
+            [None, Some(vec![vec![Vec::new()]])];
+        for cell_blocks in cell_block_variants {
+            let table = Table {
+                rows: vec![vec!["texto plano".to_owned()]],
+                cell_blocks,
+                ..Table::default()
+            };
+            let node = Node::Table(table);
+            let mut resources = Vec::new();
+            let mut simplified = false;
+
+            let blocks = convert_docling_node(&node, &mut resources, &mut simplified);
+
+            let Block::Table { headers, .. } = &blocks[0] else {
+                panic!("expected a table block");
+            };
+            assert_eq!(headers[0], vec![Inline::Text("texto plano".to_owned())]);
+            assert!(!simplified);
+        }
+    }
+
+    #[test]
+    fn docling_nested_table_cell_content_remains_readable_and_is_marked_simplified() {
+        use docling::{Node, Table};
+
+        let table = Table {
+            rows: vec![vec!["flat fallback".to_owned()]],
+            cell_blocks: Some(vec![vec![vec![Node::ListItem {
+                ordered: false,
+                number: 1,
+                first_in_list: true,
+                text: "item".to_owned(),
+                level: 0,
+                marker: None,
+                location: None,
+                dclx: None,
+                href: None,
+                layer: None,
+            }]]]),
+            ..Table::default()
+        };
+        let node = Node::Table(table);
+        let mut resources = Vec::new();
+        let mut simplified = false;
+
+        let blocks = convert_docling_node(&node, &mut resources, &mut simplified);
+
+        let Block::Table { headers, .. } = &blocks[0] else {
+            panic!("expected a table block");
+        };
+        assert_eq!(headers[0], vec![Inline::Text("item".to_owned())]);
+        assert!(simplified);
     }
 
     #[cfg(unix)]
