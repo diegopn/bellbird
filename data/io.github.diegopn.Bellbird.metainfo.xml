@@ -11,6 +11,7 @@
   <url type="bugtracker">https://github.com/diegopn/bellbird/issues</url>
   <url type="vcs-browser">https://github.com/diegopn/bellbird</url>
   <url type="help">https://diegopn.github.io/bellbird-site/manual/</url>
+  <url type="contact">https://diegopn.github.io/#contato</url>
   <url type="donation">https://github.com/sponsors/diegopn</url>
   <summary>Convert documents into structured LaTeX</summary>
   <summary xml:lang="pt_BR">Converta documentos em LaTeX estruturado</summary>
