@@ -6,7 +6,7 @@ All kinds of help are welcome. You can report a problem, test the app, improve a
 
 - **Report problems:** [open an issue](https://github.com/diegopn/bellbird/issues) with the Bellbird version, your Linux distribution, the input file format, what you expected, and what happened. Include steps to reproduce the issue.
 - **Help test:** try importing supported file formats and exporting each LaTeX template. Let us know which combinations you tried and what happened.
-- **Improve translations:** help translate the interface in `po/pt_BR.po` or `po/es.po`. The original interface messages are written in English in the source code.
+- **Improve translations:** help translate the interface in `po/pt_BR.po`, `po/es.po`, `po/fr.po`, or `po/it.po`. The original interface messages are written in English in the source code.
 - **Improve the code:** small, focused changes are easier to review. When changing conversion behavior, include tests for the changed behavior when practical.
 - **Improve the documentation:** clarify features, supported formats, limitations, and examples.
 
@@ -20,6 +20,8 @@ The [README](README.md#build-on-fedora) lists the dependencies and instructions 
 cargo fmt --all -- --check
 msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo
 msgfmt --check po/es.po -o /tmp/bellbird-es.mo
+msgfmt --check po/fr.po -o /tmp/bellbird-fr.mo
+msgfmt --check po/it.po -o /tmp/bellbird-it.mo
 cargo clippy --all-targets -- -D warnings
 cargo test
 ```

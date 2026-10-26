@@ -33,6 +33,8 @@ Run the project checks with:
 cargo fmt --all -- --check
 msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo
 msgfmt --check po/es.po -o /tmp/bellbird-es.mo
+msgfmt --check po/fr.po -o /tmp/bellbird-fr.mo
+msgfmt --check po/it.po -o /tmp/bellbird-it.mo
 cargo clippy --all-targets -- -D warnings
 cargo test
 ```
