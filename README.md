@@ -4,7 +4,7 @@ Bellbird is a GNOME app that converts documents into structured LaTeX. Conversio
 
 ## Features
 
-- Opens `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex`, and `.txt` files.
+- Opens legacy Word `.doc` files as well as `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex`, and `.txt` files.
 - Generates documents using ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle), and Springer Nature (sn-jnl) formats.
 - Displays the generated LaTeX with line numbers, and lets you copy or export the code.
 - Suggests the Downloads folder and a `.tex` filename when exporting; you can choose a different location and filename.
