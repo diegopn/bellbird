@@ -15,7 +15,11 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Check PO catalogs
-        run: msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo && msgfmt --check po/es.po -o /tmp/bellbird-es.mo
+        run: |
+          msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo
+          msgfmt --check po/es.po -o /tmp/bellbird-es.mo
+          msgfmt --check po/fr.po -o /tmp/bellbird-fr.mo
+          msgfmt --check po/it.po -o /tmp/bellbird-it.mo
       - name: Run Clippy
         run: cargo clippy --all-targets -- -D warnings
       - name: Run tests

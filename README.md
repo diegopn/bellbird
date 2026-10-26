@@ -4,50 +4,53 @@
 
 # Bellbird
 
-O Bellbird é um aplicativo para GNOME que converte documentos em código LaTeX organizado. A conversão acontece localmente: o aplicativo não exige conta nem conexão com a internet para processar arquivos.
+Bellbird is a GNOME app that converts documents into structured LaTeX. Conversion happens locally; the app does not require an account or an internet connection to process files.
 
-## Recursos
+## Features
 
-- Abre arquivos `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex` e `.txt`.
-- Gera documentos nos formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) e Springer Nature (sn-jnl).
-- Mostra o LaTeX gerado com numeração de linhas e permite copiar ou exportar o código.
-- Ao exportar, sugere a pasta Downloads e o nome do documento com a extensão `.tex`; o seletor permite escolher outro destino e nome.
-- Usa os dados de autoria encontrados no documento. Quando não há autor, o LaTeX marca o local para preenchimento.
-- Mantém a saída em um único arquivo `.tex`: não gera PDF nem arquivos separados de imagem ou bibliografia. Recursos de imagem e anexos são omitidos; descrições de imagem são preservadas como texto quando disponíveis.
+- Opens legacy Word `.doc` files as well as `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex`, and `.txt` files.
+- Generates documents using ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle), and Springer Nature (sn-jnl) formats.
+- Displays the generated LaTeX with line numbers, and lets you copy or export the code.
+- Suggests the Downloads folder and a `.tex` filename when exporting; you can choose a different location and filename.
+- Uses author information found in the source document. If no author is available, the LaTeX output includes a placeholder.
+- Exports a single `.tex` file. It does not generate PDFs or separate image or bibliography files. Images and attachments are omitted; image descriptions are preserved as text when available.
 
-O Bellbird não compila LaTeX. Para criar um PDF, abra o arquivo exportado em uma distribuição LaTeX com a classe e os pacotes exigidos pelo formato escolhido.
+Bellbird does not compile LaTeX. To create a PDF, open the exported file with a LaTeX distribution that includes the class and packages required by the selected format.
 
-## Executar no Fedora
+## Build on Fedora
 
-Requisitos: Rust 1.92 ou superior, GTK 4, libadwaita e GNU gettext. No Fedora, instale as dependências de compilação:
+Requirements: Rust 1.92 or later, GTK 4, libadwaita, and GNU gettext. Install the build dependencies on Fedora:
 
 ```sh
 sudo dnf install cargo gtk4-devel libadwaita-devel gettext
 ```
 
-Na primeira compilação, o Cargo precisa baixar as dependências Rust que ainda não estão no cache. Execute o projeto com:
+On the first build, Cargo downloads dependencies that are not already in its cache. Run the app with:
 
 ```sh
 cargo run --locked
 ```
 
-Para executar as verificações do projeto:
+Run the project checks with:
 
 ```sh
 cargo fmt --all -- --check
 msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo
 msgfmt --check po/es.po -o /tmp/bellbird-es.mo
+msgfmt --check po/fr.po -o /tmp/bellbird-fr.mo
+msgfmt --check po/it.po -o /tmp/bellbird-it.mo
 cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
-## Licença
+## License
 
-GPL-3.0-or-later. Consulte [`LICENSE`](LICENSE).
+GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 
 ## Links
 
-- [Site do projeto](https://diegopn.github.io/bellbird-site/)
-- [Repositório](https://github.com/diegopn/bellbird)
-- [Relatar um problema](https://github.com/diegopn/bellbird/issues)
-- [Site do criador](https://diegopn.github.io/)
+- [Project website](https://diegopn.github.io/bellbird-site/)
+- [Source repository](https://github.com/diegopn/bellbird)
+- [Contributing guide](CONTRIBUTING.md)
+- [Report an issue](https://github.com/diegopn/bellbird/issues)
+- [Creator's website](https://diegopn.github.io/)

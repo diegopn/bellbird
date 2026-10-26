@@ -10,18 +10,21 @@
   <url type="homepage">https://diegopn.github.io/bellbird-site/</url>
   <url type="bugtracker">https://github.com/diegopn/bellbird/issues</url>
   <url type="vcs-browser">https://github.com/diegopn/bellbird</url>
+  <url type="help">https://diegopn.github.io/bellbird-site/manual/</url>
+  <url type="contact">https://diegopn.github.io/#contato</url>
+  <url type="donation">https://github.com/sponsors/diegopn</url>
   <summary>Convert documents into structured LaTeX</summary>
   <summary xml:lang="pt_BR">Converta documentos em LaTeX estruturado</summary>
   <summary xml:lang="es">Convierte documentos a LaTeX estructurado</summary>
   <description>
     <p>Bellbird is an offline GNOME application that converts documents into readable LaTeX. It does not compile LaTeX or create PDF files.</p>
-    <p>Import Markdown, plain text, HTML, DOCX, ODT, EPUB, common reStructuredText, Org, or existing LaTeX. Export academic LaTeX in ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle), or Springer Nature (sn-jnl) formats, then copy the read-only result.</p>
+    <p>Import legacy Word DOC, DOCX, Markdown, plain text, HTML, ODT, EPUB, common reStructuredText, Org, or existing LaTeX. Export academic LaTeX in ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle), or Springer Nature (sn-jnl) formats, then copy the read-only result.</p>
     <p>The application processes files locally and does not require an account or network access.</p>
     <p xml:lang="pt_BR">Bellbird é um aplicativo GNOME offline que converte documentos em LaTeX legível. Ele não compila LaTeX nem cria arquivos PDF.</p>
-    <p xml:lang="pt_BR">Importe Markdown, texto simples, HTML, DOCX, ODT, EPUB, reStructuredText comum, Org ou LaTeX existente. Exporte LaTeX acadêmico nos formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) ou Springer Nature (sn-jnl) e copie o resultado somente para leitura.</p>
+    <p xml:lang="pt_BR">Importe arquivos Word legados DOC, DOCX, Markdown, texto simples, HTML, ODT, EPUB, reStructuredText comum, Org ou LaTeX existente. Exporte LaTeX acadêmico nos formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) ou Springer Nature (sn-jnl) e copie o resultado somente para leitura.</p>
     <p xml:lang="pt_BR">O aplicativo processa arquivos localmente e não exige conta nem acesso à rede.</p>
     <p xml:lang="es">Bellbird es una aplicación GNOME sin conexión que convierte documentos en LaTeX legible. No compila LaTeX ni crea archivos PDF.</p>
-    <p xml:lang="es">Importa Markdown, texto plano, HTML, DOCX, ODT, EPUB, reStructuredText común, Org o LaTeX existente. Exporta LaTeX académico en los formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) o Springer Nature (sn-jnl), y copia el resultado de solo lectura.</p>
+    <p xml:lang="es">Importa archivos Word antiguos DOC, DOCX, Markdown, texto plano, HTML, ODT, EPUB, reStructuredText común, Org o LaTeX existente. Exporta LaTeX académico en los formatos ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle) o Springer Nature (sn-jnl), y copia el resultado de solo lectura.</p>
     <p xml:lang="es">La aplicación procesa los archivos localmente y no requiere una cuenta ni acceso a la red.</p>
   </description>
   <screenshots>
@@ -43,6 +46,12 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.0" date="2026-10-26">
+      <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.3.0</url>
+      <description>
+        <p>Improves document structure and formatting preservation in generated LaTeX, including tables and nested content, captions, lists, inline formatting, line breaks, citations, metadata, and code blocks. Adds support for legacy Word DOC files and French and Italian translations. Also improves conversion guidance and LaTeX output safety, adds help, contact, and donation links, and updates project documentation and automated checks.</p>
+      </description>
+    </release>
     <release version="0.2.0" date="2026-10-21">
       <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.2.0</url>
       <description>

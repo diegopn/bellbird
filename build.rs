@@ -15,11 +15,15 @@ fn main() {
 
     println!("cargo:rerun-if-changed=po/pt_BR.po");
     println!("cargo:rerun-if-changed=po/es.po");
+    println!("cargo:rerun-if-changed=po/fr.po");
+    println!("cargo:rerun-if-changed=po/it.po");
     println!("cargo:rerun-if-env-changed=BELLBIRD_LOCALE_DIR");
 
     for (source, locales) in [
         ("pt_BR.po", &["pt_BR", "pt", "pt_PT"][..]),
         ("es.po", &["es", "es_ES", "es_419"][..]),
+        ("fr.po", &["fr", "fr_FR"][..]),
+        ("it.po", &["it", "it_IT"][..]),
     ] {
         let source = manifest.join("po").join(source);
         for locale in locales {

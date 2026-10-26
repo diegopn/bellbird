@@ -371,6 +371,43 @@ fn markdown_tables_and_math_select_only_needed_packages() {
 }
 
 #[test]
+fn table_cell_line_break_does_not_end_the_row() {
+    let document = Document {
+        blocks: vec![Block::Table {
+            headers: vec![
+                vec![Inline::Text("Descrição".into())],
+                vec![Inline::Text("Valor".into())],
+            ],
+            rows: vec![vec![
+                vec![
+                    Inline::Text("primeira linha".into()),
+                    Inline::LineBreak,
+                    Inline::Text("segunda linha".into()),
+                    Inline::Text(" ".into()),
+                    Inline::Strong(vec![
+                        Inline::Text("destaque".into()),
+                        Inline::LineBreak,
+                        Inline::Text("em duas linhas".into()),
+                    ]),
+                ],
+                vec![Inline::Text("conteúdo".into())],
+            ]],
+        }],
+        ..Document::default()
+    };
+
+    let latex = render_latex(&document, LatexTemplate::Standard);
+
+    assert!(
+        latex.contains(
+            r"primeira linha\newline{}segunda linha \textbf{destaque\newline{}em duas linhas} & conteúdo\\"
+        ),
+        "{latex}"
+    );
+    assert!(bellbird::document::validate_generated_latex(&latex).is_ok());
+}
+
+#[test]
 fn strikethrough_keeps_emphasis_semantics_and_hyperref_loads_last() {
     let document = parse_markdown("[link](https://example.org) and ~~removed~~\n");
     let latex = render_latex(&document, LatexTemplate::Standard);

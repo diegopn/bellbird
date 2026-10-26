@@ -1,0 +1,167 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Bellbird 0.2.0\n"
+"PO-Revision-Date: 2026-10-26 00:00+0000\n"
+"Last-Translator: Bellbird contributors\n"
+"Language-Team: Italian\n"
+"MIME-Version: 1.0\n"
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Drop a document here"
+msgstr "Trascina qui un documento"
+
+msgid "or select a file"
+msgstr "oppure seleziona un file"
+
+msgid "Select a file"
+msgstr "Seleziona un file"
+
+msgid "Supported formats:"
+msgstr "Formati supportati:"
+
+msgid "Supported documents"
+msgstr "Documenti supportati"
+
+msgid "Choose a document"
+msgstr "Scegli un documento"
+
+msgid "Could not open the file chooser."
+msgstr "Impossibile aprire la finestra di selezione dei file."
+
+msgid "Open"
+msgstr "Apri"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Open another document"
+msgstr "Apri un altro documento"
+
+msgid "Application menu"
+msgstr "Menu dell’applicazione"
+
+msgid "Automatic"
+msgstr "Automatico"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "About Bellbird"
+msgstr "Informazioni su Bellbird"
+
+msgid "Convert documents into structured LaTeX"
+msgstr "Converti documenti in LaTeX strutturato"
+
+msgid "Standard LaTeX"
+msgstr "LaTeX standard"
+
+msgid "ABNT (abntex2)"
+msgstr "ABNT (abntex2)"
+
+msgid "IEEEtran"
+msgstr "IEEEtran"
+
+msgid "ABNT · abnTeX2"
+msgstr "ABNT · abnTeX2"
+
+msgid "IEEE · IEEEtran"
+msgstr "IEEE · IEEEtran"
+
+msgid "ACM · acmart"
+msgstr "ACM · acmart"
+
+msgid "Elsevier · elsarticle"
+msgstr "Elsevier · elsarticle"
+
+msgid "Springer Nature · sn-jnl"
+msgstr "Springer Nature · sn-jnl"
+
+msgid "Line numbers"
+msgstr "Numeri di riga"
+
+msgid "Created by Diego Pereira do Nascimento"
+msgstr "Creato da Diego Pereira do Nascimento"
+
+msgid "Dedicated to my wife Karina, who always encourages me to go further."
+msgstr "Dedicato a mia moglie Karina, che mi incoraggia sempre ad andare avanti."
+
+msgid "Report an issue"
+msgstr "Segnala un problema"
+
+msgid "Project repository"
+msgstr "Repository del progetto"
+
+msgid "Project website"
+msgstr "Sito web del progetto"
+
+msgid "Project creator’s website"
+msgstr "Sito web dell’autore del progetto"
+
+msgid "LaTeX style"
+msgstr "Stile LaTeX"
+
+msgid "LaTeX output"
+msgstr "Output LaTeX"
+
+msgid "Generated LaTeX has structural or citation issues. Review it before exporting."
+msgstr "Il LaTeX generato presenta problemi strutturali o di citazione. Verificalo prima di esportare."
+
+msgid "Some content was converted to plain text to preserve valid LaTeX."
+msgstr "Alcuni contenuti sono stati convertiti in testo semplice per mantenere valido il LaTeX."
+
+msgid "Processing document…"
+msgstr "Elaborazione del documento…"
+
+msgid "Copy LaTeX"
+msgstr "Copia LaTeX"
+
+msgid "Export LaTeX"
+msgstr "Esporta LaTeX"
+
+msgid "Save"
+msgstr "Salva"
+
+msgid "LaTeX exported successfully"
+msgstr "Esportazione del LaTeX completata"
+
+msgid "Could not export LaTeX."
+msgstr "Impossibile esportare il LaTeX."
+
+msgid "Copied to clipboard"
+msgstr "Copiato negli appunti"
+
+msgid "Images and attached resources are omitted from LaTeX output; image descriptions are kept when available."
+msgstr "Le immagini e le risorse allegate sono escluse dall’output LaTeX; le relative descrizioni vengono mantenute quando disponibili."
+
+msgid "Conversion failed."
+msgstr "Conversione non riuscita."
+
+msgid "Could not convert the document"
+msgstr "Impossibile convertire il documento"
+
+msgid "The selected file is not available as a local path."
+msgstr "Il file selezionato non è disponibile tramite un percorso locale."
+
+msgid "Could not read the file"
+msgstr "Impossibile leggere il file"
+
+msgid "This file format is not supported yet"
+msgstr "Questo formato di file non è ancora supportato"
+
+msgid "Files must be 10 MiB or smaller."
+msgstr "I file non devono superare i 10 MiB."
+
+msgid "The document expands beyond the safe processing limit."
+msgstr "Il documento estratto supera il limite di elaborazione sicuro."
+
+msgid "The document is not valid UTF-8."
+msgstr "Il documento non è codificato in UTF-8 valido."

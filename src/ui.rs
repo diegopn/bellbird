@@ -877,10 +877,12 @@ fn begin_import(path: std::path::PathBuf, views: &Views) {
 fn display_imported(views: &Views, imported: ImportedFile, template: LatexTemplate) {
     let mut validation_issue = None;
     let mut safe_fallback_used = false;
+    let mut simplified_conversion = false;
     let output = match &imported.source {
         ImportedSource::Document(document) => {
             let output = render_latex(document, template);
             safe_fallback_used = used_safe_fallback(&output);
+            simplified_conversion = document.has_simplified_content;
             validation_issue = validate_generated_latex(&output).err();
             output
         }
@@ -915,16 +917,16 @@ fn display_imported(views: &Views, imported: ImportedFile, template: LatexTempla
         stack.set_visible_child_name("result");
     }
     views.state.borrow_mut().output = output;
-    if safe_fallback_used {
-        show_toast(
-            views,
-            &tr("Some content was converted to plain text to preserve valid LaTeX."),
-        );
-    } else if let Some(issue) = validation_issue {
+    if let Some(issue) = validation_issue {
         eprintln!("Generated LaTeX needs review: {issue}");
         show_toast(
             views,
             &tr("Generated LaTeX has structural or citation issues. Review it before exporting."),
+        );
+    } else if safe_fallback_used || simplified_conversion {
+        show_toast(
+            views,
+            &tr("Some content was converted to plain text to preserve valid LaTeX."),
         );
     }
 }
