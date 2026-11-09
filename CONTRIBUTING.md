@@ -1,6 +1,8 @@
 # Contributing
 
-All kinds of help are welcome. You can report a problem, test the app, improve a translation, or contribute code and documentation. You do not need Rust experience to help.
+All kinds of help are welcome. You can report a problem, test the app, improve a translation, or contribute code and documentation. You do not need Rust experience to help. By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+For security vulnerabilities, follow [SECURITY.md](SECURITY.md); do not report them publicly.
 
 ## Ways to help
 
@@ -14,7 +16,7 @@ When reporting or testing document issues, use a small sample created for that p
 
 ## Set up the development environment
 
-Install the dependencies listed in [BUILDING.md](BUILDING.md), then run the same checks used by continuous integration:
+Install the dependencies listed in the [README build instructions](README.md#building-from-source-on-linux), then run the same checks used by continuous integration:
 
 ```sh
 cargo fmt --all -- --check
