@@ -1,6 +1,8 @@
 # Bellbird
 
-Bellbird is a GNOME app that converts documents into structured LaTeX. Conversion happens locally; the app does not require an account or an internet connection to process files.
+Bellbird is an offline GNOME app that converts supported documents into structured LaTeX. It processes files locally and exports a single `.tex` file; it does not compile PDFs.
+
+[Download the latest release](https://github.com/diegopn/bellbird/releases/latest) · [Project website](https://diegopn.github.io/bellbird-site/) · [User manual](https://diegopn.github.io/bellbird-site/manual/)
 
 ## Features
 
@@ -43,9 +45,8 @@ cargo test
 
 GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 
-## Links
+## More links
 
-- [Project website](https://diegopn.github.io/bellbird-site/)
 - [Source repository](https://github.com/diegopn/bellbird)
 - [Contributing guide](CONTRIBUTING.md)
 - [Report an issue](https://github.com/diegopn/bellbird/issues)
