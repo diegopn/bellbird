@@ -14,7 +14,7 @@ When reporting or testing document issues, use a small sample created for that p
 
 ## Set up the development environment
 
-The [README](README.md#build-on-fedora) lists the dependencies and instructions for running Bellbird. After installing them, run the same checks used by continuous integration:
+Install the dependencies listed in [BUILDING.md](BUILDING.md), then run the same checks used by continuous integration:
 
 ```sh
 cargo fmt --all -- --check

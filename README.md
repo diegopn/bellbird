@@ -15,74 +15,51 @@
 </p>
 
 
-## Features
+<p align="center">
+  <a href="https://www.rust-lang.org/"><img alt="Rust" src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white"></a>
+  <a href="https://www.gtk.org/"><img alt="GTK 4" src="https://img.shields.io/badge/GTK-4A86CF?style=for-the-badge&logo=gnome&logoColor=white"></a>
+  <a href="https://gnome.pages.gitlab.gnome.org/libadwaita/"><img alt="Libadwaita" src="https://img.shields.io/badge/Libadwaita-3584E4?style=for-the-badge&logo=gnome&logoColor=white"></a>
+</p>
 
-- Opens legacy Word `.doc` files as well as `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex`, and `.txt` files.
-- Generates documents using ABNT (abnTeX2), IEEE (IEEEtran), ACM (acmart), Elsevier (elsarticle), and Springer Nature (sn-jnl) formats.
-- Displays the generated LaTeX with line numbers, and lets you copy or export the code.
-- Suggests the Downloads folder and a `.tex` filename when exporting; you can choose a different location and filename.
-- Uses author information found in the source document. If no author is available, the LaTeX output includes a placeholder.
-- Exports a single `.tex` file. It does not generate PDFs or separate image or bibliography files. Images and attachments are omitted; image descriptions are preserved as text when available.
+Bellbird converts documents to structured LaTeX locally. It prepares the source for editing in a LaTeX application.
 
-Bellbird does not compile LaTeX. To create a PDF, open the exported file with a LaTeX distribution that includes the class and packages required by the selected format.
+## At a glance
 
-## Building from source on Linux
+| Input | Templates | Result |
+| --- | --- | --- |
+| `.doc`, `.docx`, `.epub`, `.htm`, `.html`, `.markdown`, `.md`, `.odt`, `.org`, `.rst`, `.tex`, `.txt` | ABNT, IEEE, ACM, Elsevier, Springer Nature | One editable `.tex` file, ready to copy or export |
 
-Requirements: Rust 1.92 or later, GTK 4.10 or later, libadwaita 1.5 or later, and GNU gettext. Package versions vary by distribution release; check these minimums before building.
+Bellbird uses author information from the source when available. It does not compile PDFs or export separate image or bibliography files; image descriptions are kept as text when available.
 
-### Fedora and compatible RPM distributions
+## Screenshots
 
-```sh
-sudo dnf install gcc rustup pkgconf-pkg-config gtk4-devel libadwaita-devel gettext
-```
+<table>
+  <tr>
+    <td align="center"><strong>Document conversion</strong></td>
+    <td align="center"><strong>Publication format selection</strong></td>
+  </tr>
+  <tr>
+    <td><img src="data/screenshots/bellbird-01-editor.png" alt="Bellbird displaying generated LaTeX from a Word document" width="100%"></td>
+    <td><img src="data/screenshots/bellbird-04-formats.png" alt="Bellbird format menu with ABNT, IEEE, ACM, Elsevier, and Springer Nature templates" width="100%"></td>
+  </tr>
+</table>
 
-On Fedora, run `rustup-init` once after installing `rustup`.
+## Build from source
 
-### Debian, Ubuntu, and derivatives
+See [BUILDING.md](BUILDING.md) for Linux dependencies and development commands on Fedora, Debian/Ubuntu, Arch, and openSUSE.
 
-```sh
-sudo apt-get install build-essential rustup pkg-config gettext libgtk-4-dev libadwaita-1-dev
-```
+## Contributing
 
-### Arch-based distributions
+See [CONTRIBUTING.md](CONTRIBUTING.md) for ways to report problems, test the app, improve translations, or contribute code and documentation.
 
-```sh
-sudo pacman -S --needed base-devel rustup pkgconf gettext gtk4 libadwaita
-```
+## Support
 
-### openSUSE Tumbleweed
+Sponsorship supports Bellbird development, maintenance, documentation, and releases.
 
-```sh
-sudo zypper install gcc rustup pkgconf-pkg-config gettext-tools gtk4-devel libadwaita-devel
-```
-
-### Build and run
-
-On the first build, Cargo downloads dependencies that are not already in its cache.
-
-```sh
-cargo run --locked
-```
-
-### Project checks
-
-```sh
-cargo fmt --all -- --check
-msgfmt --check po/pt_BR.po -o /tmp/bellbird-pt_BR.mo
-msgfmt --check po/es.po -o /tmp/bellbird-es.mo
-msgfmt --check po/fr.po -o /tmp/bellbird-fr.mo
-msgfmt --check po/it.po -o /tmp/bellbird-it.mo
-cargo clippy --all-targets -- -D warnings
-cargo test
-```
+<p align="center">
+  <a href="https://github.com/sponsors/diegopn"><img alt="Become a sponsor" src="https://img.shields.io/badge/Become_a_sponsor-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white"></a>
+</p>
 
 ## License
 
-GPL-3.0-or-later. See [`LICENSE`](LICENSE).
-
-## More links
-
-- [Source repository](https://github.com/diegopn/bellbird)
-- [Contributing guide](CONTRIBUTING.md)
-- [Report an issue](https://github.com/diegopn/bellbird/issues)
-- [Creator's website](https://diegopn.github.io/)
+GPL-3.0-or-later. See [LICENSE](LICENSE).
