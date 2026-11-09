@@ -1,8 +1,19 @@
-# Bellbird
+<p align="center">
+  <a href="https://diegopn.github.io/bellbird-site/">
+    <img src="data/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg" alt="Bellbird icon" width="112" />
+  </a>
+</p>
 
-Bellbird is an offline GNOME app that converts supported documents into structured LaTeX. It processes files locally and exports a single `.tex` file; it does not compile PDFs.
+<h1 align="center">Bellbird</h1>
 
-[Download the latest release](https://github.com/diegopn/bellbird/releases/latest) · [Project website](https://diegopn.github.io/bellbird-site/) · [User manual](https://diegopn.github.io/bellbird-site/manual/)
+<p align="center">An offline GNOME app that converts supported documents into structured LaTeX. It processes files locally and exports a single <code>.tex</code> file.</p>
+
+<p align="center">
+  <a href="https://github.com/diegopn/bellbird/releases/latest">Download</a> ·
+  <a href="https://diegopn.github.io/bellbird-site/">Website</a> ·
+  <a href="https://diegopn.github.io/bellbird-site/manual/">User manual</a>
+</p>
+
 
 ## Features
 
@@ -15,21 +26,45 @@ Bellbird is an offline GNOME app that converts supported documents into structur
 
 Bellbird does not compile LaTeX. To create a PDF, open the exported file with a LaTeX distribution that includes the class and packages required by the selected format.
 
-## Build on Fedora
+## Building from source on Linux
 
-Requirements: Rust 1.92 or later, GTK 4, libadwaita, and GNU gettext. Install the build dependencies on Fedora:
+Requirements: Rust 1.92 or later, GTK 4.10 or later, libadwaita 1.5 or later, and GNU gettext. Package versions vary by distribution release; check these minimums before building.
+
+### Fedora and compatible RPM distributions
 
 ```sh
-sudo dnf install cargo gtk4-devel libadwaita-devel gettext
+sudo dnf install gcc rustup pkgconf-pkg-config gtk4-devel libadwaita-devel gettext
 ```
 
-On the first build, Cargo downloads dependencies that are not already in its cache. Run the app with:
+On Fedora, run `rustup-init` once after installing `rustup`.
+
+### Debian, Ubuntu, and derivatives
+
+```sh
+sudo apt-get install build-essential rustup pkg-config gettext libgtk-4-dev libadwaita-1-dev
+```
+
+### Arch-based distributions
+
+```sh
+sudo pacman -S --needed base-devel rustup pkgconf gettext gtk4 libadwaita
+```
+
+### openSUSE Tumbleweed
+
+```sh
+sudo zypper install gcc rustup pkgconf-pkg-config gettext-tools gtk4-devel libadwaita-devel
+```
+
+### Build and run
+
+On the first build, Cargo downloads dependencies that are not already in its cache.
 
 ```sh
 cargo run --locked
 ```
 
-Run the project checks with:
+### Project checks
 
 ```sh
 cargo fmt --all -- --check
