@@ -102,7 +102,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for ways to report problems, test the app
 
 Sponsorship supports Bellbird development, maintenance, documentation, and releases.
 
-<p align="center">
+<p align="left">
   <a href="https://github.com/sponsors/diegopn"><img alt="Become a sponsor" src="https://img.shields.io/badge/Become_a_sponsor-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white"></a>
 </p>
 
