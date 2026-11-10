@@ -47,6 +47,12 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.4.0" date="2026-11-10">
+      <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.4.0</url>
+      <description>
+        <p>Refreshes project documentation with clearer product information, Linux build instructions for several distributions, and updated contribution, security, and conduct guidance.</p>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-10-26">
       <url type="details">https://github.com/diegopn/bellbird/releases/tag/v0.3.0</url>
       <description>
