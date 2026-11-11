@@ -1,50 +1,10 @@
-use crate::document::{Block, Document, Inline, ResourceReference};
-use crate::error::BellbirdError;
-use pulldown_cmark::Parser;
+use crate::document::{Block, Inline, ResourceReference};
 
-use super::markdown::{markdown_options, parse_blocks};
-use super::plain_text::{extract_explicit_metadata, parse_plain_text, plain_block_text};
+use super::super::plain_text::parse_plain_text;
+use super::inline::{docling_link, parse_markdown_inlines, plain_block_text_inlines};
+use super::lists::{DoclingListItem, convert_docling_list_items};
 
-pub(super) fn convert_structured_document(
-    display_name: String,
-    extension: &str,
-    bytes: &[u8],
-) -> Result<Document, BellbirdError> {
-    let format = docling::InputFormat::from_extension(extension)
-        .filter(|format| format.is_compiled_in())
-        .ok_or_else(|| BellbirdError::UnsupportedFormat(extension.to_owned()))?;
-    let source = docling::SourceDocument::from_bytes(display_name, format, bytes.to_vec());
-    let converted = docling::DocumentConverter::new()
-        .strict(true)
-        .fetch_images(false)
-        .convert(source)
-        .map_err(|error| BellbirdError::Conversion(error.to_string()))?;
-
-    Ok(convert_docling_document(&converted.document))
-}
-
-#[derive(Clone)]
-struct DoclingListItem {
-    ordered: bool,
-    number: u64,
-    first_in_list: bool,
-    level: u8,
-    marker: Option<String>,
-    content: Vec<Inline>,
-}
-
-fn convert_docling_document(document: &docling::DoclingDocument) -> Document {
-    let mut converted = Document::default();
-    converted.blocks = convert_docling_nodes(
-        &document.nodes,
-        &mut converted.resources,
-        &mut converted.has_simplified_content,
-    );
-    extract_explicit_metadata(&mut converted);
-    converted
-}
-
-fn convert_docling_nodes(
+pub(super) fn convert_docling_nodes(
     nodes: &[docling::Node],
     resources: &mut Vec<ResourceReference>,
     simplified: &mut bool,
@@ -146,61 +106,6 @@ fn convert_docling_nodes(
     }
     blocks
 }
-
-fn convert_docling_list_items(
-    items: &[DoclingListItem],
-    cursor: &mut usize,
-    level: u8,
-    simplified: &mut bool,
-) -> Vec<Block> {
-    let mut blocks = Vec::new();
-    while let Some(item) = items.get(*cursor) {
-        let item_level = item.level;
-        if item_level < level {
-            break;
-        }
-        if item_level > level {
-            *simplified = true;
-            blocks.extend(convert_docling_list_items(
-                items, cursor, item_level, simplified,
-            ));
-            continue;
-        }
-
-        let ordered = item.ordered;
-        let start_number = item.number;
-        let mut list = Vec::new();
-        let mut item_labels = Vec::new();
-        while let Some(item) = items.get(*cursor) {
-            if item.level != level
-                || item.ordered != ordered
-                || (!list.is_empty() && item.first_in_list)
-            {
-                break;
-            }
-            let mut content = vec![Block::Paragraph(item.content.clone())];
-            item_labels.push(item.marker.clone());
-            *cursor += 1;
-            if items.get(*cursor).is_some_and(|next| next.level > level) {
-                content.extend(convert_docling_list_items(
-                    items,
-                    cursor,
-                    level.saturating_add(1),
-                    simplified,
-                ));
-            }
-            list.push(content);
-        }
-        blocks.push(Block::List {
-            ordered,
-            start: (ordered && start_number != 1).then_some(start_number),
-            item_labels,
-            items: list,
-        });
-    }
-    blocks
-}
-
 pub(super) fn convert_docling_node(
     node: &docling::Node,
     resources: &mut Vec<ResourceReference>,
@@ -463,67 +368,4 @@ fn docling_table_cell_inlines(
     } else {
         inlines
     }
-}
-
-fn plain_block_text_inlines(text: String) -> Vec<Inline> {
-    let mut inlines = Vec::new();
-    for (index, line) in text.split('\n').enumerate() {
-        if index > 0 {
-            inlines.push(Inline::LineBreak);
-        }
-        if !line.is_empty() {
-            inlines.push(Inline::Text(line.trim_end_matches('\r').to_owned()));
-        }
-    }
-    inlines
-}
-
-fn docling_link(content: Vec<Inline>, href: &Option<String>) -> Vec<Inline> {
-    match href.as_deref().filter(|href| !href.trim().is_empty()) {
-        Some(target) => vec![Inline::Link {
-            target: target.to_owned(),
-            title: None,
-            content,
-        }],
-        None => content,
-    }
-}
-
-fn parse_markdown_inlines(input: &str, resources: &mut Vec<ResourceReference>) -> Vec<Inline> {
-    let mut events = Parser::new_ext(input, markdown_options()).peekable();
-    let blocks = parse_blocks(&mut events, None, resources);
-    let mut inlines = Vec::new();
-    for block in blocks {
-        match block {
-            Block::Heading { content, .. } | Block::Paragraph(content) => inlines.extend(content),
-            Block::CodeBlock { content, .. } => inlines.push(Inline::Code(content)),
-            Block::DisplayMath(formula) => inlines.push(Inline::Math(formula)),
-            Block::List { items, .. } => {
-                for item in items {
-                    for block in item {
-                        if !inlines.is_empty() {
-                            inlines.push(Inline::LineBreak);
-                        }
-                        inlines
-                            .extend(parse_markdown_inlines(&plain_block_text(&block), resources));
-                    }
-                }
-            }
-            Block::Quote(children) => {
-                for child in children {
-                    inlines.extend(parse_markdown_inlines(&plain_block_text(&child), resources));
-                }
-            }
-            Block::Table { headers, rows } => {
-                for cell in headers.into_iter().chain(rows.into_iter().flatten()) {
-                    if !inlines.is_empty() {
-                        inlines.push(Inline::Text(" | ".to_owned()));
-                    }
-                    inlines.extend(cell);
-                }
-            }
-            Block::FootnoteDefinition { .. } | Block::HorizontalRule => {}
-        }
-    }
-    inlines
 }
