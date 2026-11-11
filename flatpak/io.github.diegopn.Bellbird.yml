@@ -32,7 +32,7 @@ modules:
       - install -Dm0644 data/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/io.github.diegopn.Bellbird.svg"
       - install -Dm0644 data/icons/hicolor/scalable/actions/external-link-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/external-link-symbolic.svg"
       - install -Dm0644 data/icons/hicolor/scalable/actions/document-open-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/document-open-symbolic.svg"
-      - install -Dm0644 data/icons/hicolor/scalable/actions/help-about-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/help-about-symbolic.svg"
+      - install -Dm0644 data/icons/hicolor/scalable/actions/bellbird-about-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/bellbird-about-symbolic.svg"
       - install -Dm0644 data/icons/hicolor/scalable/actions/open-menu-symbolic.svg "${FLATPAK_DEST}/share/icons/hicolor/scalable/actions/open-menu-symbolic.svg"
       - for size in 16 24 32 48 64 128 256 512; do install -Dm0644 "data/icons/hicolor/${size}x${size}/apps/io.github.diegopn.Bellbird.png" "${FLATPAK_DEST}/share/icons/hicolor/${size}x${size}/apps/io.github.diegopn.Bellbird.png"; done
     sources:

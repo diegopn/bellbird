@@ -80,7 +80,7 @@ pub(super) fn build_header_menu(window: &adw::ApplicationWindow) -> HeaderMenu {
     about_button.set_has_frame(false);
     about_button.add_css_class("bellbird-menu-item");
     about_button.set_child(Some(&menu_action_content(
-        "help-about-symbolic",
+        "bellbird-about-symbolic",
         &tr("About Bellbird"),
     )));
     let about_parent = window.clone();
