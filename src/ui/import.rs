@@ -145,6 +145,9 @@ pub(super) fn begin_import(path: std::path::PathBuf, views: &Views) {
                     open_button.set_visible(false);
                     open_button.set_sensitive(true);
                 }
+                if let Some(menu_button) = task_views.menu_button.upgrade() {
+                    menu_button.set_visible(true);
+                }
                 result::show_toast(&task_views, &error.user_message());
                 glib::ControlFlow::Break
             }
@@ -160,6 +163,9 @@ pub(super) fn begin_import(path: std::path::PathBuf, views: &Views) {
                 if let Some(open_button) = task_views.open_button.upgrade() {
                     open_button.set_visible(false);
                     open_button.set_sensitive(true);
+                }
+                if let Some(menu_button) = task_views.menu_button.upgrade() {
+                    menu_button.set_visible(true);
                 }
                 result::show_toast(&task_views, &tr("Conversion failed."));
                 glib::ControlFlow::Break

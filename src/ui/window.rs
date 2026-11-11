@@ -40,7 +40,7 @@ pub(super) fn build_window(application: &adw::Application) {
 
     let header_menu = menu::build_header_menu(&window);
     let menu_button = header_menu.button.clone();
-    menu_button.set_visible(false);
+    menu_button.set_visible(true);
     header.pack_start(&menu_button);
     shell.append(&header);
 
