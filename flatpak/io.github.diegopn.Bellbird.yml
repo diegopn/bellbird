@@ -19,6 +19,9 @@ finish-args:
   - --filesystem=xdg-download:create
 modules:
   - name: bellbird
+    only-arches:
+      - x86_64
+      - aarch64
     buildsystem: simple
     build-options:
       env:

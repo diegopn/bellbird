@@ -1,0 +1,67 @@
+name: Flatpak bundles
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.variant.arch }} Flatpak
+    runs-on: ${{ matrix.variant.runner }}
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: flatpak/io.github.diegopn.Bellbird.yml
+          bundle: Bellbird-${{ github.sha }}-${{ matrix.variant.arch }}.flatpak
+          artifact-name: Bellbird-${{ github.sha }}-${{ matrix.variant.arch }}
+          arch: ${{ matrix.variant.arch }}
+          upload-artifact: ${{ github.event_name == 'release' }}
+
+  publish:
+    name: Attach Flatpak bundles to release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Bellbird-${{ github.sha }}-*
+          path: dist
+          merge-multiple: true
+      - name: Name bundles for the release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          for arch in x86_64 aarch64; do
+            mv "dist/Bellbird-${GITHUB_SHA}-${arch}.flatpak" \
+              "dist/Bellbird-${version}-${arch}.flatpak"
+          done
+      - name: Upload bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/Bellbird-*.flatpak --clobber

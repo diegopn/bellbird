@@ -31,6 +31,15 @@ Bellbird converts documents to structured LaTeX locally. It prepares the source 
 
 Bellbird uses author information from the source when available. It does not compile PDFs or export separate image or bibliography files; image descriptions are kept as text when available.
 
+## Linux downloads
+
+New tagged releases provide a Flatpak bundle for each supported Linux architecture. Choose the file matching your system:
+
+- `x86_64` for 64-bit Intel or AMD processors.
+- `aarch64` for 64-bit ARM processors.
+
+Install the downloaded `.flatpak` file with your software manager or run `flatpak install --user ./FILE.flatpak`.
+
 ## Screenshots
 
 <table>
