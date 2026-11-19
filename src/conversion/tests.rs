@@ -93,6 +93,44 @@ fn import_file_reads_supported_regular_documents() {
 }
 
 #[test]
+fn path_and_byte_import_agree_for_docx_fixture() {
+    let content_types = br#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>"#;
+    let root_relationships = br#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>"#;
+    let document = br#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body><w:p><w:r><w:t>Import path parity</w:t></w:r></w:p><w:sectPr/></w:body>
+</w:document>"#;
+    let bytes = archive_with_entries(&[
+        ("[Content_Types].xml", content_types),
+        ("_rels/.rels", root_relationships),
+        ("word/document.xml", document),
+    ]);
+    let path = std::env::temp_dir().join(format!(
+        "bellbird-{}-{}.docx",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    std::fs::write(&path, &bytes).unwrap();
+
+    let from_path = import_file(&path);
+    std::fs::remove_file(&path).unwrap();
+    let from_bytes = import_bytes(path.file_name().unwrap().to_string_lossy(), "docx", &bytes);
+
+    assert_eq!(from_path.unwrap(), from_bytes.unwrap());
+}
+
+#[test]
 fn legacy_doc_extension_is_supported_and_routed_to_docling() {
     assert!(path_is_supported(Path::new("paper.doc")));
 

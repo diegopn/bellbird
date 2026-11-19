@@ -13,5 +13,5 @@ pub(super) fn convert_org_document(
     if html.len() > MAX_FILE_BYTES {
         return Err(BellbirdError::FileTooLarge);
     }
-    convert_structured_document(display_name, "html", &html)
+    convert_structured_document(display_name, "html", html)
 }

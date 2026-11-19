@@ -1,9 +1,10 @@
 use super::appearance::Appearance;
+use super::import::render_imported;
 use super::result::{
     line_number_text, line_number_text_for_wrapped_rows, selected_template_from_index,
     template_selector_enabled,
 };
-use bellbird::conversion::ImportedSource;
+use bellbird::conversion::{ImportedSource, import_bytes};
 use bellbird::document::{Document, LatexTemplate};
 
 #[test]
@@ -14,6 +15,31 @@ fn template_selector_is_reenabled_for_a_new_import() {
     assert!(!template_selector_enabled(Some(&existing_latex)));
     assert!(template_selector_enabled(None));
     assert!(template_selector_enabled(Some(&document)));
+}
+
+#[test]
+fn selected_template_rendering_borrows_the_imported_document() {
+    let imported = import_bytes(
+        "memory.md",
+        "md",
+        b"# Memory fit\n\nA paragraph that remains visible.",
+    )
+    .unwrap();
+
+    let outputs = LatexTemplate::EXPORT_OPTIONS
+        .iter()
+        .map(|template| render_imported(&imported, *template).output)
+        .collect::<Vec<_>>();
+
+    assert_eq!(outputs.len(), 5);
+    assert!(
+        outputs
+            .iter()
+            .all(|output| output.contains("A paragraph that remains visible."))
+    );
+    assert_ne!(outputs[0], outputs[1]);
+    assert_eq!(imported.display_name, "memory.md");
+    assert!(matches!(imported.source, ImportedSource::Document(_)));
 }
 
 #[test]

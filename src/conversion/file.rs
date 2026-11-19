@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -48,7 +49,7 @@ pub fn import_file(path: &Path) -> Result<ImportedFile, BellbirdError> {
     if bytes.len() > MAX_FILE_BYTES {
         return Err(BellbirdError::FileTooLarge);
     }
-    import_bytes(file_name(path), &extension, &bytes)
+    import_buffer(file_name(path), &extension, Cow::Owned(bytes))
 }
 
 pub fn import_bytes(
@@ -57,51 +58,60 @@ pub fn import_bytes(
     bytes: &[u8],
 ) -> Result<ImportedFile, BellbirdError> {
     let extension = extension.to_ascii_lowercase();
-    if !SUPPORTED_EXTENSIONS.contains(&extension.as_str()) {
-        return Err(BellbirdError::UnsupportedFormat(extension));
+    import_buffer(name.into(), &extension, Cow::Borrowed(bytes))
+}
+
+fn import_buffer(
+    name: String,
+    extension: &str,
+    bytes: Cow<'_, [u8]>,
+) -> Result<ImportedFile, BellbirdError> {
+    if !SUPPORTED_EXTENSIONS.contains(&extension) {
+        return Err(BellbirdError::UnsupportedFormat(extension.to_owned()));
     }
     if bytes.len() > MAX_FILE_BYTES {
         return Err(BellbirdError::FileTooLarge);
     }
-    let display_name = name.into();
-    let source = match extension.as_str() {
+    let display_name = name;
+    let source = match extension {
         "md" | "markdown" => ImportedSource::Document(parse_markdown(
-            std::str::from_utf8(bytes).map_err(|_| BellbirdError::InvalidUtf8)?,
+            std::str::from_utf8(bytes.as_ref()).map_err(|_| BellbirdError::InvalidUtf8)?,
         )),
         "txt" => ImportedSource::Document(parse_plain_text(
-            std::str::from_utf8(bytes).map_err(|_| BellbirdError::InvalidUtf8)?,
+            std::str::from_utf8(bytes.as_ref()).map_err(|_| BellbirdError::InvalidUtf8)?,
         )),
         "tex" => ImportedSource::ExistingLatex(
-            std::str::from_utf8(bytes)
+            std::str::from_utf8(bytes.as_ref())
                 .map_err(|_| BellbirdError::InvalidUtf8)?
                 .to_owned(),
         ),
         "rst" => ImportedSource::Document(parse_restructured_text(
-            std::str::from_utf8(bytes).map_err(|_| BellbirdError::InvalidUtf8)?,
+            std::str::from_utf8(bytes.as_ref()).map_err(|_| BellbirdError::InvalidUtf8)?,
         )?),
         "org" => {
-            let source = std::str::from_utf8(bytes).map_err(|_| BellbirdError::InvalidUtf8)?;
+            let source =
+                std::str::from_utf8(bytes.as_ref()).map_err(|_| BellbirdError::InvalidUtf8)?;
             ImportedSource::Document(convert_org_document(display_name.clone(), source)?)
         }
         "htm" | "html" => ImportedSource::Document(convert_structured_document(
             display_name.clone(),
-            &extension,
-            bytes,
+            extension,
+            bytes.into_owned(),
         )?),
         "doc" => ImportedSource::Document(convert_structured_document(
             display_name.clone(),
-            &extension,
-            bytes,
+            extension,
+            bytes.into_owned(),
         )?),
         "docx" | "odt" | "epub" => {
-            validate_office_archive(bytes)?;
+            validate_office_archive(bytes.as_ref())?;
             ImportedSource::Document(convert_structured_document(
                 display_name.clone(),
-                &extension,
-                bytes,
+                extension,
+                bytes.into_owned(),
             )?)
         }
-        _ => return Err(BellbirdError::UnsupportedFormat(extension)),
+        _ => return Err(BellbirdError::UnsupportedFormat(extension.to_owned())),
     };
     Ok(ImportedFile {
         display_name,

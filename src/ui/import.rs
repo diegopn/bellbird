@@ -124,12 +124,10 @@ pub(super) fn begin_import(path: std::path::PathBuf, views: &Views) {
                     template
                         .set_sensitive(result::template_selector_enabled(Some(&imported.source)));
                 }
-                task_views.state.borrow_mut().imported = Some(imported.clone());
-                display_imported(
-                    &task_views,
-                    imported,
-                    result::selected_template(&task_views),
-                );
+                let rendered = render_imported(&imported, result::selected_template(&task_views));
+                task_views.state.borrow_mut().imported = Some(imported);
+                display_imported(&task_views, &rendered);
+                task_views.state.borrow_mut().output = rendered.output;
                 glib::ControlFlow::Break
             }
             Ok(Err(error)) => {
@@ -174,28 +172,56 @@ pub(super) fn begin_import(path: std::path::PathBuf, views: &Views) {
     });
 }
 
-pub(super) fn display_imported(views: &Views, imported: ImportedFile, template: LatexTemplate) {
-    let mut validation_issue = None;
-    let mut safe_fallback_used = false;
-    let mut simplified_conversion = false;
-    let output = match &imported.source {
-        ImportedSource::Document(document) => {
-            let output = render_latex(document, template);
-            safe_fallback_used = used_safe_fallback(&output);
-            simplified_conversion = document.has_simplified_content;
-            validation_issue = validate_generated_latex(&output).err();
-            output
-        }
-        ImportedSource::ExistingLatex(source) => source.clone(),
-    };
+pub(super) struct RenderedImport {
+    pub(super) output: String,
+    display_name: String,
+    has_resources: bool,
+    validation_issue: Option<String>,
+    safe_fallback_used: bool,
+    simplified_conversion: bool,
+}
+
+pub(super) fn render_imported(imported: &ImportedFile, template: LatexTemplate) -> RenderedImport {
+    let (output, safe_fallback_used, simplified_conversion, validation_issue) =
+        match &imported.source {
+            ImportedSource::Document(document) => {
+                let output = render_latex(document, template);
+                let safe_fallback_used = used_safe_fallback(&output);
+                let simplified_conversion = document.has_simplified_content;
+                let validation_issue = validate_generated_latex(&output)
+                    .err()
+                    .map(|issue| issue.to_string());
+                (
+                    output,
+                    safe_fallback_used,
+                    simplified_conversion,
+                    validation_issue,
+                )
+            }
+            ImportedSource::ExistingLatex(source) => (source.clone(), false, false, None),
+        };
+    RenderedImport {
+        output,
+        display_name: imported.display_name.clone(),
+        has_resources: matches!(
+            &imported.source,
+            ImportedSource::Document(document) if !document.resources.is_empty()
+        ),
+        validation_issue,
+        safe_fallback_used,
+        simplified_conversion,
+    }
+}
+
+pub(super) fn display_imported(views: &Views, rendered: &RenderedImport) {
     if let Some(file_name) = views.file_name.upgrade() {
-        file_name.set_text(&imported.display_name);
+        file_name.set_text(&rendered.display_name);
     }
     if let Some(buffer) = views.code_buffer.upgrade() {
-        buffer.set_text(&output);
+        buffer.set_text(&rendered.output);
     }
     if let Some(buffer) = views.line_number_buffer.upgrade() {
-        buffer.set_text(&result::line_number_text(&output));
+        buffer.set_text(&result::line_number_text(&rendered.output));
     }
     if let Some(copy_button) = views.copy_button.upgrade() {
         copy_button.set_sensitive(true);
@@ -211,19 +237,18 @@ pub(super) fn display_imported(views: &Views, imported: ImportedFile, template: 
         menu_button.set_visible(true);
     }
     if let Some(resource_notice) = views.resource_notice.upgrade() {
-        resource_notice.set_visible(matches!(&imported.source, ImportedSource::Document(document) if !document.resources.is_empty()));
+        resource_notice.set_visible(rendered.has_resources);
     }
     if let Some(stack) = views.stack.upgrade() {
         stack.set_visible_child_name("result");
     }
-    views.state.borrow_mut().output = output;
-    if let Some(issue) = validation_issue {
+    if let Some(issue) = &rendered.validation_issue {
         eprintln!("Generated LaTeX needs review: {issue}");
         result::show_toast(
             views,
             &tr("Generated LaTeX has structural or citation issues. Review it before exporting."),
         );
-    } else if safe_fallback_used || simplified_conversion {
+    } else if rendered.safe_fallback_used || rendered.simplified_conversion {
         result::show_toast(
             views,
             &tr("Some content was converted to plain text to preserve valid LaTeX."),

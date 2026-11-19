@@ -85,13 +85,17 @@ pub(super) fn build_window(application: &adw::Application) {
 
     let template_views = views.clone();
     result.template.connect_selected_notify(move |_| {
-        let imported = template_views.state.borrow().imported.clone();
-        if let Some(imported) = imported {
-            import::display_imported(
-                &template_views,
-                imported,
-                result::selected_template(&template_views),
-            );
+        let template = result::selected_template(&template_views);
+        let rendered = {
+            let state = template_views.state.borrow();
+            state
+                .imported
+                .as_ref()
+                .map(|imported| import::render_imported(imported, template))
+        };
+        if let Some(rendered) = rendered {
+            import::display_imported(&template_views, &rendered);
+            template_views.state.borrow_mut().output = rendered.output;
         }
     });
 

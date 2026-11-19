@@ -24,12 +24,12 @@ pub(super) fn convert_docling_node(
 pub(super) fn convert_structured_document(
     display_name: String,
     extension: &str,
-    bytes: &[u8],
+    bytes: Vec<u8>,
 ) -> Result<Document, BellbirdError> {
     let format = docling::InputFormat::from_extension(extension)
         .filter(|format| format.is_compiled_in())
         .ok_or_else(|| BellbirdError::UnsupportedFormat(extension.to_owned()))?;
-    let source = docling::SourceDocument::from_bytes(display_name, format, bytes.to_vec());
+    let source = docling::SourceDocument::from_bytes(display_name, format, bytes);
     let converted = docling::DocumentConverter::new()
         .strict(true)
         .fetch_images(false)
